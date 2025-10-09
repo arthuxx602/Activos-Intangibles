@@ -1,7 +1,8 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/empresas', 'empresas'); // http://localhost:8000/empresas
+
+

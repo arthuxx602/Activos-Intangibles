@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 
 class TasaController extends Controller
 {
-    public function index() { return Tasa::orderBy('nombre')->get(); }
+    public function index() { return Tasa::orderBy('Tasa')->get(); }
 
     public function store(Request $r)
     {
         $data = $r->validate([
-            'nombre' => 'required|string|max:100|unique:tasas,nombre',
+            'tasa' => 'required|string|max:100|unique:tasas,tasa',
             'valor'  => 'required|numeric|min:0'
         ]);
         return response()->json(Tasa::create($data), 201);
@@ -24,7 +24,7 @@ class TasaController extends Controller
     public function update(Request $r, Tasa $tasa)
     {
         $data = $r->validate([
-            'nombre' => 'sometimes|string|max:100|unique:tasas,nombre,'.$tasa->id,
+            'tasa' => 'sometimes|string|max:100|unique:tasas,tasa,'.$tasa->id,
             'valor'  => 'sometimes|numeric|min:0'
         ]);
         $tasa->update($data);

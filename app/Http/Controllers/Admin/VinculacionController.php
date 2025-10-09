@@ -3,45 +3,108 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Vinculacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VinculacionController extends Controller
 {
+    /**
+     * GET /api/vinculaciones
+     * Filtros:
+     *   ?proyecto=ID_Proyecto
+     *   ?usuario=ID_Usuario
+     */
     public function index(Request $r)
     {
-        $q = Vinculacion::query()->with(['empresa:id,nombre','proyecto:id,nombre']);
-        if ($r->filled('empresa_id'))  $q->where('empresa_id', $r->empresa_id);
-        if ($r->filled('proyecto_id')) $q->where('proyecto_id', $r->proyecto_id);
-        return $q->paginate(20);
+        $r->validate([
+            'proyecto' => 'sometimes|integer|exists:proyecto,ID_Proyecto',
+            'usuario'  => 'sometimes|integer|exists:usuario2,ID_Usuario',
+            'per_page' => 'sometimes|integer|min:1|max:100',
+        ]);
+
+        $q = DB::table('proyecto_usuario as pu')
+            ->join('proyecto as p', 'p.ID_Proyecto', '=', 'pu.FK_ID_Proyecto')
+            ->join('usuario2 as u', 'u.ID_Usuario', '=', 'pu.FK_ID_Usuario')
+            ->select([
+                'pu.FK_ID_Proyecto as proyecto_id',
+                'p.Nombre as proyecto_nombre',
+                'pu.FK_ID_Usuario as usuario_id',
+                DB::raw("CONCAT(u.Nombre, ' ', u.Apellido) as usuario_nombre"),
+            ]);
+
+        if ($r->filled('proyecto')) {
+            $q->where('pu.FK_ID_Proyecto', $r->integer('proyecto'));
+        }
+        if ($r->filled('usuario')) {
+            $q->where('pu.FK_ID_Usuario', $r->integer('usuario'));
+        }
+
+        $perPage = $r->input('per_page', 20);
+        return $q->orderBy('p.Nombre')->orderBy('u.Nombre')->paginate($perPage);
     }
 
+    /**
+     * POST /api/vinculaciones
+     * Body (JSON o form-data):
+     * {
+     *   "proyecto": 123,
+     *   "usuarios": [1001, 1002, 1003]
+     * }
+     * Sincroniza: elimina vínculos previos y crea los nuevos.
+     */
     public function store(Request $r)
     {
         $data = $r->validate([
-            'empresa_id'  => 'required|exists:empresas,id',
-            'proyecto_id' => 'required|exists:proyectos,id',
-            'rol'         => 'nullable|string|max:100',
+            'proyecto'   => 'required|integer|exists:proyecto,ID_Proyecto',
+            'usuarios'   => 'required|array|min:1',
+            'usuarios.*' => 'integer|exists:usuario2,ID_Usuario',
         ]);
-        return response()->json(Vinculacion::create($data), 201);
+
+        DB::transaction(function () use ($data) {
+            DB::table('proyecto_usuario')
+                ->where('FK_ID_Proyecto', $data['proyecto'])
+                ->delete();
+
+            $rows = array_map(fn ($uid) => [
+                'FK_ID_Proyecto' => $data['proyecto'],
+                'FK_ID_Usuario'  => $uid,
+            ], $data['usuarios']);
+
+            DB::table('proyecto_usuario')->insert($rows);
+        });
+
+        return response()->json([
+            'message'  => 'Usuarios vinculados correctamente al proyecto.',
+            'proyecto' => $data['proyecto'],
+            'usuarios' => $data['usuarios'],
+        ], 201);
     }
 
-    public function show(Vinculacion $vinculacion) { return $vinculacion->load(['empresa','proyecto']); }
-
-    public function update(Request $r, Vinculacion $vinculacion)
+    /**
+     * DELETE /api/vinculaciones
+     * Body:
+     * {
+     *   "proyecto": 123,
+     *   "usuario":  1001
+     * }
+     * Elimina un vínculo puntual proyecto–usuario.
+     */
+    public function destroy(Request $r)
     {
         $data = $r->validate([
-            'empresa_id'  => 'sometimes|exists:empresas,id',
-            'proyecto_id' => 'sometimes|exists:proyectos,id',
-            'rol'         => 'sometimes|nullable|string|max:100',
+            'proyecto' => 'required|integer|exists:proyecto,ID_Proyecto',
+            'usuario'  => 'required|integer|exists:usuario2,ID_Usuario',
         ]);
-        $vinculacion->update($data);
-        return $vinculacion->fresh()->load(['empresa','proyecto']);
-    }
 
-    public function destroy(Vinculacion $vinculacion)
-    {
-        $vinculacion->delete();
-        return response()->noContent();
+        $deleted = DB::table('proyecto_usuario')
+            ->where('FK_ID_Proyecto', $data['proyecto'])
+            ->where('FK_ID_Usuario',  $data['usuario'])
+            ->delete();
+
+        return response()->json([
+            'message'  => $deleted ? 'Vínculo eliminado.' : 'No se encontró el vínculo.',
+            'proyecto' => $data['proyecto'],
+            'usuario'  => $data['usuario'],
+        ], $deleted ? 200 : 404);
     }
 }

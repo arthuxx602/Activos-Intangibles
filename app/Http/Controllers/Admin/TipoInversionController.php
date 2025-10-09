@@ -8,32 +8,40 @@ use Illuminate\Http\Request;
 
 class TipoInversionController extends Controller
 {
-    public function index() { return TipoInversion::orderBy('nombre')->get(); }
-
-    public function store(Request $r)
+    // PUT /api/tipos-inversion/{tipo_inversion}
+    public function update(Request $r, TipoInversion $tipo_inversion)
     {
         $data = $r->validate([
-            'nombre'      => 'required|string|max:150|unique:tipo_inversions,nombre',
-            'descripcion' => 'nullable|string'
+            'Nombre'      => 'required|string|max:150',
+            'Descripcion' => 'required|string|max:1000',
         ]);
-        return response()->json(TipoInversion::create($data), 201);
+
+        $tipo_inversion->update($data);
+
+        return response()->json([
+            'message' => 'Tipo de inversión actualizado exitosamente.',
+            'data'    => $tipo_inversion->fresh(),
+        ], 200);
     }
 
-    public function show(TipoInversion $tipoInversion) { return $tipoInversion; }
-
-    public function update(Request $r, TipoInversion $tipoInversion)
+    // (Opcional) Compatibilidad con tu form legacy (POST con nombres originales)
+    // POST /api/tipos-inversion/update-legacy
+    public function updateLegacy(Request $r)
     {
         $data = $r->validate([
-            'nombre'      => 'sometimes|string|max:150|unique:tipo_inversions,nombre,'.$tipoInversion->id,
-            'descripcion' => 'sometimes|nullable|string'
+            'id_tipo'          => 'required|integer|exists:tipo,ID_TIPO',
+            'nombre_tipo'      => 'required|string|max:150',
+            'descripcion_tipo' => 'required|string|max:1000',
         ]);
-        $tipoInversion->update($data);
-        return $tipoInversion->fresh();
-    }
 
-    public function destroy(TipoInversion $tipoInversion)
-    {
-        $tipoInversion->delete();
-        return response()->noContent();
+        $t = TipoInversion::findOrFail($data['id_tipo']);
+        $t->Nombre      = $data['nombre_tipo'];
+        $t->Descripcion = $data['descripcion_tipo'];
+        $t->save();
+
+        return response()->json([
+            'message' => 'Tipo de inversión actualizado exitosamente.',
+            'data'    => $t,
+        ], 200);
     }
 }

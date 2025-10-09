@@ -5,43 +5,60 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Inversion;
 use App\Models\Proyecto;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class DescargaController extends Controller
 {
-    public function inversiones(): StreamedResponse
+    /**
+     * GET /api/descargas/{recurso}/{id}/certificado
+     * {recurso} = inversiones | proyectos
+     */
+    public function certificado(string $recurso, int $id)
     {
-        $rows = Inversion::with('proyecto:id,nombre')->cursor();
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=inversiones.csv'
-        ];
+        // 1) Resolver modelo y campo archivo según recurso
+        switch ($recurso) {
+            case 'inversiones':
+                $model = Inversion::findOrFail($id);
+                $filename = basename((string) $model->CertificadoInversion); // campo en BD
+                $candidatePaths = [
+                    // Storage (recomendado)
+                    storage_path('app/certificados/inversiones/'.$filename),
+                    // Public (fallback)
+                    public_path('certificados/inversiones/'.$filename),
+                ];
+                break;
 
-        return response()->stream(function() use ($rows) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, ['ID','Proyecto','Monto','Fecha']);
-            foreach ($rows as $i) {
-                fputcsv($out, [$i->id, optional($i->proyecto)->nombre, $i->monto, $i->created_at]);
+            case 'proyectos':
+                $model = Proyecto::findOrFail($id);
+                $filename = basename((string) $model->Certificado); // campo en BD
+                $candidatePaths = [
+                    // Storage (recomendado)
+                    storage_path('app/certificados/proyectos/'.$filename),
+                    // Fallbacks comunes
+                    public_path('certificados/proyectos/'.$filename),
+                    public_path('Documento_P/'.$filename), // compat con tu legacy
+                ];
+                break;
+
+            default:
+                return response()->json(['message' => 'Recurso no soportado.'], 400);
+        }
+
+        // 2) Validaciones básicas
+        if ($filename === '' || $filename === '.' || $filename === '..') {
+            return response()->json(['message' => 'Archivo no configurado.'], 404);
+        }
+
+        // 3) Buscar primer path existente y descargar
+        foreach ($candidatePaths as $path) {
+            if ($path && is_file($path)) {
+                // entrega como adjunto
+                return response()->download($path, $filename);
             }
-            fclose($out);
-        }, 200, $headers);
-    }
+        }
 
-    public function proyectos(): StreamedResponse
-    {
-        $rows = Proyecto::cursor();
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=proyectos.csv'
-        ];
-
-        return response()->stream(function() use ($rows) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, ['ID','Nombre','Monto','Estado','Creacion']);
-            foreach ($rows as $p) {
-                fputcsv($out, [$p->id, $p->nombre, $p->monto, $p->estado, $p->created_at]);
-            }
-            fclose($out);
-        }, 200, $headers);
+        // 4) No encontrado
+        return response()->json(['message' => 'Archivo no encontrado.'], 404);
     }
 }

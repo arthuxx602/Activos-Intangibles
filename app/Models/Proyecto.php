@@ -8,6 +8,7 @@ class Proyecto extends Model
 {
     protected $table = 'proyecto';
     protected $primaryKey = 'ID_Proyecto';
-    public $incrementing = true;
-    protected $fillable = ['Nombre','Fecha']; // añade más columnas si las usas
+    public $timestamps = false;
+
+    protected $fillable = ['Nombre','Fecha','Descripcion','Certificado'];
 }

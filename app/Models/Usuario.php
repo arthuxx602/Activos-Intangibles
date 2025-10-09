@@ -8,8 +8,11 @@ class Usuario extends Model
 {
     protected $table = 'usuario2';
     protected $primaryKey = 'ID_Usuario';
-    public $incrementing = false;
-    protected $keyType = 'int'; // si tu cédula es numérica; si es string, usa 'string'
+    public $timestamps = false;
 
-    protected $fillable = ['Nombre','Apellido','FK_ID_Rol'];
+    // Si tu PK NO es autoincremental (cédula):
+    // public $incrementing = false;
+    // protected $keyType = 'int'; // o 'string'
+
+    protected $fillable = ['Nombre','Apellido','Telefono','Correo','Contraseña','FK_ID_Municipio'];
 }

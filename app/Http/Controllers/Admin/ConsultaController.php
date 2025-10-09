@@ -158,4 +158,21 @@ class ConsultaController extends Controller
 
         return compact('proyectos','empresas','inversiones');
     }
+      public function proyectosNoLiquidados()
+    {
+        return DB::table('proyecto')
+            ->select('ID_Proyecto','Nombre','Fecha','Descripcion','Certificado')
+            ->where('liquidado', '<>', 1)
+            ->orderBy('Nombre')
+            ->get();
+    }
+
+    public function usuariosParaVincular()
+    {
+        return DB::table('usuario2')
+            ->select('ID_Usuario','Nombre','Apellido','Telefono','Correo','FK_ID_Rol')
+            ->where('FK_ID_Rol','<>',1)
+            ->orderBy('Nombre')
+            ->get();
+    }
 }

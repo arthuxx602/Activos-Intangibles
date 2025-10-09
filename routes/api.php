@@ -1,113 +1,100 @@
-return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        api: __DIR__.'/../routes/api.php', // 
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
-    )
-    ->withMiddleware()
-    ->withExceptions()
-    ->create();
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\UsuarioController;
-use App\Http\Controllers\Admin\ProyectoController;
-use App\Http\Controllers\Admin\InversionController;
-
-// Ruta de prueba
-Route::get('/test', fn() => response()->json(['status' => 'API funcionando ✅']));
-
-// Usuarios
-Route::get('/usuarios', [UsuarioController::class, 'index']);
-Route::post('/usuarios', [UsuarioController::class, 'store']);
-Route::put('/usuarios/{id}', [UsuarioController::class, 'update']);
-Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy']);
-
-// Proyectos
-Route::get('/proyectos', [ProyectoController::class, 'index']);
-Route::post('/proyectos', [ProyectoController::class, 'store']);
-Route::put('/proyectos/{id}', [ProyectoController::class, 'update']);
-Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy']);
-use App\Http\Controllers\Admin\{
-    EmpresaController, PaisController, DepartamentoController, MunicipioController,
-    TipoInversionController, TasaController, UbicacionController, VinculacionController,
-    LiquidacionController, SimulacionController, ConsultaController, ReporteController, DescargaController
-};
-
-Route::apiResources([
-    'empresas'        => EmpresaController::class,
-    'paises'          => PaisController::class,
-    'departamentos'   => DepartamentoController::class,
-    'municipios'      => MunicipioController::class,
-    'tipos-inversion' => TipoInversionController::class,
-    'tasas'           => TasaController::class,
-    'ubicaciones'     => UbicacionController::class,
-    'vinculaciones'   => VinculacionController::class,
-    'liquidaciones'   => LiquidacionController::class,
-    'simulaciones'    => SimulacionController::class,
-]);
-
-Route::get('reportes/datos-line', [ReporteController::class, 'datosLine']);
-Route::get('consultas/busqueda',  [ConsultaController::class, 'busqueda']);
-Route::get('descargas/inversiones', [DescargaController::class, 'inversiones']);
-Route::get('descargas/proyectos',   [DescargaController::class, 'proyectos']);
-
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Admin\UsuarioController;
-use App\Http\Controllers\Admin\ProyectoController;
-use App\Http\Controllers\Admin\InversionController;
+// ===== Controladores =====
+use App\Http\Controllers\Admin\{
+    AdminController,
+    ConsultaController,
+    DepartamentoController,
+    DescargaController,
+    EmpresaController,
+    InversionController,
+    LiquidacionController,
+    MunicipioController,
+    PaisController,
+    ProyectoController,
+    ReporteController,
+    SimulacionController,
+    TasaController,
+    TipoInversionController,
+    UbicacionController,
+    UsuarioController,
+    VinculacionController
+};
 
-use App\Http\Controllers\Admin\EmpresaController;
-use App\Http\Controllers\Admin\PaisController;
-use App\Http\Controllers\Admin\DepartamentoController;
-use App\Http\Controllers\Admin\MunicipioController;
-use App\Http\Controllers\Admin\TipoInversionController;
-use App\Http\Controllers\Admin\TasaController;
-use App\Http\Controllers\Admin\UbicacionController;
-use App\Http\Controllers\Admin\VinculacionController;
-use App\Http\Controllers\Admin\LiquidacionController;
-use App\Http\Controllers\Admin\SimulacionController;
-use App\Http\Controllers\Admin\ConsultaController;
-use App\Http\Controllers\Admin\ReporteController;
-use App\Http\Controllers\Admin\DescargaController;
-
-// Ping de salud
+// ===== Ruta de prueba =====
 Route::get('/test', fn () => response()->json(['status' => 'API funcionando ✅']));
 
-// Recursos REST (CRUD)
-Route::apiResources([
-    'usuarios'        => UsuarioController::class,
-    'proyectos'       => ProyectoController::class,
-    'inversiones'     => InversionController::class,
-    'empresas'        => EmpresaController::class,
-    'paises'          => PaisController::class,
-    'departamentos'   => DepartamentoController::class,
-    'municipios'      => MunicipioController::class,
-    'tipos-inversion' => TipoInversionController::class,
-    'tasas'           => TasaController::class,
-    'ubicaciones'     => UbicacionController::class,
-    'vinculaciones'   => VinculacionController::class,
-    'liquidaciones'   => LiquidacionController::class,
-    'simulaciones'    => SimulacionController::class,
-]);
 
-// Acciones específicas
+
+// ===== CRUDs principales (API Resources) =====
+Route::apiResource('usuarios', UsuarioController::class);
+Route::apiResource('proyectos', ProyectoController::class);
+Route::apiResource('inversiones', InversionController::class);
+
+Route::apiResource('empresas', EmpresaController::class);
+Route::apiResource('paises', PaisController::class);
+Route::apiResource('departamentos', DepartamentoController::class);
+Route::apiResource('municipios', MunicipioController::class);
+Route::apiResource('tipos-inversion', TipoInversionController::class);
+Route::apiResource('tasas', TasaController::class);
+Route::apiResource('ubicaciones', UbicacionController::class);
+Route::apiResource('vinculaciones', VinculacionController::class);
+Route::apiResource('liquidaciones', LiquidacionController::class);
+Route::apiResource('simulaciones', SimulacionController::class);
+
+// ===== Acciones específicas =====
 Route::post('proyectos/{proyecto}/liquidar', [ProyectoController::class, 'liquidar']);
 Route::post('proyectos/{proyecto}/simular',  [ProyectoController::class, 'simular']);
 
-// Consultas y reportes
-Route::get('consultas/busqueda',  [ConsultaController::class, 'busqueda']);
+// ===== Consultas =====
+Route::get('consultas/usuarios',                        [ConsultaController::class, 'usuarios']);
+Route::get('consultas/proyectos-por-usuario/{usuario}', [ConsultaController::class, 'proyectosPorUsuario']);
+Route::get('consultas/resumen',                         [ConsultaController::class, 'resumen']);
+Route::get('consultas/busqueda',                        [ConsultaController::class, 'busqueda']);
+Route::get('vinculaciones',                             [VinculacionController::class, 'index']);
+Route::get('proyectos',                                 [ProyectoController::class, 'index']);
+// Catálogos para selects
+Route::get('catalogos/proyectos-no-liquidados', [ConsultaController::class, 'proyectosNoLiquidados']);
+Route::get('catalogos/usuarios-para-vincular',  [ConsultaController::class, 'usuariosParaVincular']);
+
+// ===== Reportes / Gráficos =====
 Route::get('reportes/datos-line', [ReporteController::class, 'datosLine']);
 
-// Descargas
-Route::get('descargas/inversiones', [DescargaController::class, 'inversiones']);
-Route::get('descargas/proyectos',   [DescargaController::class, 'proyectos']);
+// ===== Descargas =====
+// recurso: inversiones | proyectos
+Route::get('descargas/{recurso}/{id}/certificado', [DescargaController::class, 'certificado'])
+    ->whereIn('recurso', ['inversiones', 'proyectos']);
+// Descargas (genérica)
+ Route::get('descargas/{recurso}/{id}/certificado', [DescargaController::class, 'certificado'])
+    ->whereIn('recurso', ['inversiones', 'proyectos']);
 
+// (Opcional: si implementaste listados de descargas)
+Route::get('descargas/inversiones', [DescargaController::class, 'inversiones'])->name('descargas.inversiones');
+Route::get('descargas/proyectos',   [DescargaController::class, 'proyectos'])->name('descargas.proyectos');
 
-Route::get('consultas/usuarios', [ConsultaController::class, 'usuarios']);
-Route::get('consultas/proyectos-por-usuario/{usuario}', [ConsultaController::class, 'proyectosPorUsuario']);
-Route::get('consultas/resumen', [ConsultaController::class, 'resumen']);
-Route::get('consultas/busqueda', [ConsultaController::class, 'busqueda']); // opcional
+// ===== Operaciones en lote (si se implemento =====
+Route::delete('inversiones', [InversionController::class, 'destroyMany']);   // DELETE body: { "ids": [...] }
+Route::delete('proyectos',   [ProyectoController::class, 'destroyMany']);   // DELETE body: { "ids": [...] }
+Route::delete('departamentos', [DepartamentoController::class, 'destroyMany']); // opcional (lote)
+Route::delete('paises', [PaisController::class, 'destroyMany']);
+Route::delete('proyectos', [ProyectoController::class, 'destroyMany']); // opcional para eliminación múltiple
+Route::delete('vinculaciones', [VinculacionController::class, 'destroy']);
+
+// Ejemplo opcional:
+# Route::delete('municipios', [MunicipioController::class, 'destroyMany']);
+
+// ===== Compatibilidad con formularios legacy (opcionales) =====
+Route::post('usuarios/update-legacy',         [UsuarioController::class, 'updateLegacy']);
+Route::post('municipios/update-legacy',       [MunicipioController::class, 'updateLegacy']);
+Route::post('paises/update-legacy',           [PaisController::class, 'updateLegacy']);
+Route::post('tipos-inversion/update-legacy',  [TipoInversionController::class, 'updateLegacy']);
+Route::post('vinculaciones',                  [VinculacionController::class, 'store']);
+
+// ===== Fallback genérico (404 JSON) =====
+Route::fallback(function () {
+    return response()->json([
+        'message' => '❌ Ruta no encontrada. Verifica la URL y el método HTTP.'
+    ], 404);
+});
