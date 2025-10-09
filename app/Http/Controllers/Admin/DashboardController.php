@@ -28,4 +28,37 @@ class DashboardController extends Controller
             'total_usuarios'    => (int) ($usuarios->total_usuarios ?? 0),
         ]);
     }
+    // (ya tienes summary())
+
+    /**
+     * GET /api/dashboard/proyectos-por-mes?year=YYYY
+     * Devuelve { year, labels[12], series[12] } con cantidad de proyectos por mes.
+     */
+    public function proyectosPorMes(Request $r)
+    {
+        $year = (int) ($r->input('year') ?: date('Y'));
+
+        // Trae pares (mes, total) del año solicitado
+        $rows = DB::table('proyecto')
+            ->selectRaw('MONTH(Fecha) as mes, COUNT(*) as total')
+            ->whereYear('Fecha', $year)
+            ->groupBy(DB::raw('MONTH(Fecha)'))
+            ->pluck('total', 'mes');  // [mes => total]
+
+        // Prepara 12 posiciones
+        $series = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $series[] = (int) ($rows[$m] ?? 0);
+        }
+
+        // Etiquetas de meses (abrevia si prefieres)
+        $labels = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+        return response()->json([
+            'year'   => $year,
+            'labels' => $labels,
+            'series' => $series,
+        ]);
+    }
 }
+
