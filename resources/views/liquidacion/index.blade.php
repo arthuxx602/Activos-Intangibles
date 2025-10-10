@@ -1,3 +1,7 @@
+@extends('layouts.app')
+@section('title','Liquidacion')
+@section('page-title','Liquidacion')
+@section('content')
 <!doctype html>
 <html lang="es">
 <head>
@@ -203,3 +207,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 </script>
 </body>
 </html>
+@endsection

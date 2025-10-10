@@ -1,3 +1,9 @@
+@extends('layouts.app')
+@section('title','Empresas')
+@section('page-title','Empresas')
+@section('content')
+<div class="alert alert-info">Página de liquidacion (usa /api/proyectos para datos). Puedes reutilizar la tabla que ya tenías.</div>
+@endsection('content')
 <!doctype html>
 <html lang="es">
 <head>
@@ -389,3 +395,4 @@
 </script>
 </body>
 </html>
+@endsection

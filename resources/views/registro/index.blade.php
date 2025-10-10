@@ -1,3 +1,7 @@
+@extends('layouts.app')
+@section('title','tasas')
+@section('page-title','tasas')
+@section('content')
 <!doctype html>
 <html lang="es">
 <head>
@@ -414,3 +418,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 </script>
 </body>
 </html>
+@endsection('content')

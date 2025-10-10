@@ -1,89 +1,76 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Inversiones</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.app')
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <style>
-    body { background:#f8fafc; }
-    .card { border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,.05); }
-  </style>
-</head>
-<body>
-<div class="container py-4">
+@section('title','Inversiones')
+@section('page-title','Inversiones')
 
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h3 class="mb-0">Inversiones</h3>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalInv" onclick="abrirCrear()">
-      <i class="bi bi-plus-lg me-1"></i> Nueva inversión
-    </button>
-  </div>
+@section('content')
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h3 class="mb-0">Inversiones</h3>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalInv" onclick="abrirCrear()">
+    <i class="bi bi-plus-lg me-1"></i> Nueva inversión
+  </button>
+</div>
 
-  <!-- FILTROS -->
-  <div class="card mb-3">
-    <div class="card-body">
-      <div class="row g-3 align-items-end">
-        <div class="col-sm-3">
-          <label class="form-label">Usuario</label>
-          <select id="fUsuario" class="form-select"></select>
-        </div>
-        <div class="col-sm-3">
-          <label class="form-label">Proyecto</label>
-          <select id="fProyecto" class="form-select"></select>
-        </div>
-        <div class="col-sm-2">
-          <label class="form-label">Tipo</label>
-          <select id="fTipo" class="form-select"></select>
-        </div>
-        <div class="col-sm-2">
-          <label class="form-label">Desde</label>
-          <input id="fDesde" type="date" class="form-control">
-        </div>
-        <div class="col-sm-2">
-          <label class="form-label">Hasta</label>
-          <input id="fHasta" type="date" class="form-control">
-        </div>
+<!-- FILTROS -->
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-sm-3">
+        <label class="form-label">Usuario</label>
+        <select id="fUsuario" class="form-select"></select>
+      </div>
+      <div class="col-sm-3">
+        <label class="form-label">Proyecto</label>
+        <select id="fProyecto" class="form-select"></select>
+      </div>
+      <div class="col-sm-2">
+        <label class="form-label">Tipo</label>
+        <select id="fTipo" class="form-select"></select>
+      </div>
+      <div class="col-sm-2">
+        <label class="form-label">Desde</label>
+        <input id="fDesde" type="date" class="form-control">
+      </div>
+      <div class="col-sm-2">
+        <label class="form-label">Hasta</label>
+        <input id="fHasta" type="date" class="form-control">
+      </div>
 
-        <div class="col-12 d-flex gap-2">
-          <input id="fSearch" type="text" class="form-control" placeholder="Buscar por nombre o descripción...">
-          <button class="btn btn-outline-secondary" onclick="resetFiltros()">Limpiar</button>
-          <button class="btn btn-primary" onclick="cargarInversiones()">Aplicar</button>
-        </div>
+      <div class="col-12 d-flex gap-2">
+        <input id="fSearch" type="text" class="form-control" placeholder="Buscar por nombre o descripción...">
+        <button class="btn btn-outline-secondary" onclick="resetFiltros()">Limpiar</button>
+        <button class="btn btn-primary" onclick="cargarInversiones()">Aplicar</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- TABLA -->
-  <div class="card">
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table align-middle" id="tbl">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Usuario</th>
-              <th>Proyecto</th>
-              <th>Tipo</th>
-              <th class="text-end">Monto</th>
-              <th>Certificado</th>
-              <th class="text-end">Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
+<!-- TABLA -->
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table align-middle" id="tbl">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Proyecto</th>
+            <th>Tipo</th>
+            <th class="text-end">Monto</th>
+            <th>Certificado</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
 
-      <!-- Paginación simple -->
-      <div class="d-flex justify-content-between align-items-center mt-2">
-        <div id="pageInfo" class="text-secondary small"></div>
-        <div class="btn-group" role="group">
-          <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="cambiarPagina(-1)">«</button>
-          <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="cambiarPagina(1)">»</button>
-        </div>
+    <!-- Paginación simple -->
+    <div class="d-flex justify-content-between align-items-center mt-2">
+      <div id="pageInfo" class="text-secondary small"></div>
+      <div class="btn-group" role="group">
+        <button class="btn btn-outline-secondary btn-sm" id="prevBtn" onclick="cambiarPagina(-1)">«</button>
+        <button class="btn btn-outline-secondary btn-sm" id="nextBtn" onclick="cambiarPagina(1)">»</button>
       </div>
     </div>
   </div>
@@ -139,20 +126,17 @@
     </form>
   </div>
 </div>
+@endsection
 
-<!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+@section('scripts')
 <script>
 const API = '/api';
 let pagination = { current_page: 1, last_page: 1 };
 
-// === helpers ===
 const $ = sel => document.querySelector(sel);
 function fmtMoney(n){ return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n||0); }
 
-// === filtros ===
 async function cargarCatalogos(){
-  // usuarios
   const u = await (await fetch(`${API}/catalogos/usuarios-para-vincular`)).json();
   const selU = $('#fUsuario'); selU.innerHTML = `<option value="">Todos</option>`;
   const selUF = $('#FK_ID_Usuario'); selUF.innerHTML = `<option value="">Seleccione...</option>`;
@@ -162,7 +146,6 @@ async function cargarCatalogos(){
     selUF.add(opt);
   });
 
-  // proyectos (puedes filtrar no liquidados si quieres)
   const p = await (await fetch(`${API}/proyectos?per_page=1000`)).json();
   const listP = p.data ?? [];
   const selP = $('#fProyecto'); selP.innerHTML = `<option value="">Todos</option>`;
@@ -173,7 +156,6 @@ async function cargarCatalogos(){
     selPF.add(opt);
   });
 
-  // tipos
   const t = await (await fetch(`${API}/tipos-inversion?per_page=1000`)).json();
   const listT = t.data ?? t;
   const selT = $('#fTipo'); selT.innerHTML = `<option value="">Todos</option>`;
@@ -210,7 +192,7 @@ async function cargarInversiones(page = null){
   const res = await fetch(`${API}/inversiones?${params.toString()}`);
   const data = await res.json();
 
-  const rows = data.data ?? data; // paginate o simple
+  const rows = data.data ?? data;
   const tbody = $('#tbody');
   tbody.innerHTML = '';
 
@@ -233,8 +215,7 @@ async function cargarInversiones(page = null){
           <button class="btn btn-sm btn-outline-primary" onclick='abrirEditar(${JSON.stringify(inv)})'><i class="bi bi-pencil-square"></i></button>
           <button class="btn btn-sm btn-outline-danger"  onclick="eliminar(${inv.ID_Inversion})"><i class="bi bi-trash"></i></button>
         </div>
-      </td>
-    `;
+      </td>`;
     tbody.appendChild(tr);
   });
 
@@ -256,7 +237,6 @@ function cambiarPagina(delta){
   cargarInversiones(next);
 }
 
-// === modal ===
 let modal;
 document.addEventListener('DOMContentLoaded', async ()=>{
   modal = new bootstrap.Modal('#modalInv');
@@ -267,14 +247,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 function abrirCrear(){
   $('#tituloModal').textContent = 'Nueva inversión';
   $('#idInv').value = '';
-  $('#Nombre').value = '';
-  $('#Monto').value = '';
-  $('#Fecha').value = '';
-  $('#FK_ID_Usuario').value = '';
-  $('#FK_ID_Proyecto').value = '';
-  $('#FK_ID_Tipo').value = '';
-  $('#Descripcion').value = '';
-  $('#CertificadoInversion').value = '';
+  $('#formInv').reset();
 }
 
 function abrirEditar(inv){
@@ -316,5 +289,4 @@ async function eliminar(id){
   await cargarInversiones();
 }
 </script>
-</body>
-</html>
+@endsection

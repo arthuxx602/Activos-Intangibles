@@ -1,3 +1,7 @@
+@extends('layouts.app')
+@section('title','liquidar-proyecto')
+@section('page-title','liquidar-proyecto')
+@section('content')
 <!doctype html>
 <html lang="es">
 <head>
@@ -130,3 +134,4 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 </script>
 </body>
 </html>
+@endsection('content')
