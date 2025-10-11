@@ -43,7 +43,7 @@ Route::apiResource('proyectos',       ProyectoController::class);
 Route::apiResource('inversiones',     InversionController::class);
 Route::apiResource('empresas',        EmpresaController::class);
 Route::apiResource('paises',          PaisController::class);
-Route::apiResource('departamentos',   DepartamentoController::class);
+//Route::apiResource('departamentos',   DepartamentoController::class);
 Route::apiResource('municipios',      MunicipioController::class);
 Route::apiResource('tipos-inversion', TipoInversionController::class);
 Route::apiResource('tasas',           TasaController::class);
