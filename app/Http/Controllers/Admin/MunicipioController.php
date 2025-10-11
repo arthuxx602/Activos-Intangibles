@@ -10,38 +10,47 @@ class MunicipioController extends Controller
 {
     public function index(Request $r)
     {
-        $q = Municipio::query()->with('departamento:id,nombre,pais_id');
-        if ($r->filled('departamento_id')) $q->where('departamento_id', $r->departamento_id);
-        return $q->orderBy('nombre')->get();
+        if ($r->wantsJson()) {
+            $q = Municipio::query()->with('departamento:ID_Departamento,Nombre,FK_ID_Pais');
+
+            if ($r->filled('departamento')) $q->where('FK_ID_Departamento', $r->integer('departamento'));
+            if ($r->filled('search')) {
+                $s = $r->string('search');
+                $q->where('Nombre', 'like', "%{$s}%");
+            }
+
+            return $q->orderBy('Nombre')->get();
+        }
+
+        return view('ubicacion.index');
     }
 
-    public function store(Request $request)
+    public function store(Request $r)
     {
-        $data = $request->validate([
-            'departamento_id' => 'required|exists:departamentos,id',
-            'nombre'          => 'required|string|max:150'
+        $data = $r->validate([
+            'Nombre'            => 'required|string|max:200',
+            'FK_ID_Departamento'=> 'required|exists:departamento,ID_Departamento',
         ]);
-        return response()->json(Municipio::create($data), 201);
+
+        $m = Municipio::create($data);
+        return response()->json($m, 201);
     }
 
-    public function show(Municipio $municipio)
+    public function update(Request $r, $id)
     {
-        return $municipio->load('departamento:id,nombre,pais_id');
-    }
-
-    public function update(Request $request, Municipio $municipio)
-    {
-        $data = $request->validate([
-            'departamento_id' => 'sometimes|exists:departamentos,id',
-            'nombre'          => 'sometimes|string|max:150'
+        $m = Municipio::findOrFail($id);
+        $data = $r->validate([
+            'Nombre'            => 'required|string|max:200',
+            'FK_ID_Departamento'=> 'required|exists:departamento,ID_Departamento',
         ]);
-        $municipio->update($data);
-        return $municipio->fresh()->load('departamento:id,nombre,pais_id');
+
+        $m->update($data);
+        return response()->json(['message' => 'Municipio actualizado', 'municipio' => $m]);
     }
 
-    public function destroy(Municipio $municipio)
+    public function destroy($id)
     {
-        $municipio->delete();
+        Municipio::findOrFail($id)->delete();
         return response()->noContent();
     }
 }

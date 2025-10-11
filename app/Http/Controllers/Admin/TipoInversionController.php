@@ -1,47 +1,63 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
-
+namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\TipoInversion;
 use Illuminate\Http\Request;
 
 class TipoInversionController extends Controller
 {
-    // PUT /api/tipos-inversion/{tipo_inversion}
-    public function update(Request $r, TipoInversion $tipo_inversion)
+    public function index(Request $request)
     {
-        $data = $r->validate([
-            'Nombre'      => 'required|string|max:150',
-            'Descripcion' => 'required|string|max:1000',
-        ]);
+        // Si se pide JSON (API): devolvemos TODOS (para DataTables client-side)
+        // con filtro opcional ?search=...
+        if ($request->wantsJson()) {
+            $q = TipoInversion::query();
 
-        $tipo_inversion->update($data);
+            if ($request->filled('search')) {
+                $s = $request->string('search');
+                $q->where(function($qq) use ($s) {
+                    $qq->where('Nombre', 'like', "%{$s}%")
+                       ->orWhere('Descripcion', 'like', "%{$s}%");
+                });
+            }
 
-        return response()->json([
-            'message' => 'Tipo de inversión actualizado exitosamente.',
-            'data'    => $tipo_inversion->fresh(),
-        ], 200);
+            return $q->orderByDesc('ID_Tipo')->get();
+        }
+
+        // Si es la vista:
+        return view('tipos-inversion.index');
     }
 
-    // (Opcional) Compatibilidad con tu form legacy (POST con nombres originales)
-    // POST /api/tipos-inversion/update-legacy
-    public function updateLegacy(Request $r)
+    public function store(Request $request)
     {
-        $data = $r->validate([
-            'id_tipo'          => 'required|integer|exists:tipo,ID_TIPO',
-            'nombre_tipo'      => 'required|string|max:150',
-            'descripcion_tipo' => 'required|string|max:1000',
+        $data = $request->validate([
+            'Nombre' => 'required|string|max:255',
+            'Descripcion' => 'nullable|string',
         ]);
 
-        $t = TipoInversion::findOrFail($data['id_tipo']);
-        $t->Nombre      = $data['nombre_tipo'];
-        $t->Descripcion = $data['descripcion_tipo'];
-        $t->save();
+        $tipo = TipoInversion::create($data);
+        return response()->json(['message' => 'Tipo creado exitosamente', 'tipo' => $tipo], 201);
+    }
 
-        return response()->json([
-            'message' => 'Tipo de inversión actualizado exitosamente.',
-            'data'    => $t,
-        ], 200);
+    public function update(Request $request, $id)
+    {
+        $tipo = TipoInversion::findOrFail($id);
+
+        $data = $request->validate([
+            'Nombre' => 'required|string|max:255',
+            'Descripcion' => 'nullable|string',
+        ]);
+
+        $tipo->update($data);
+        return response()->json(['message' => 'Tipo actualizado correctamente']);
+    }
+
+    public function destroy($id)
+    {
+        $tipo = TipoInversion::findOrFail($id);
+        $tipo->delete();
+
+        return response()->json(['message' => 'Tipo eliminado correctamente']);
     }
 }

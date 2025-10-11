@@ -3,21 +3,15 @@
 @section('title','Inicio')
 @section('page-title','Inicio')
 
-@section('head')
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-@endsection
-
 @section('content')
-<div class="row g-4">
+<div class="row align-items-center g-4 mb-4">
   <div class="col-md-4 text-center text-md-start">
-    <img class="img-fluid rounded" src="https://dummyimage.com/480x240/eff2f7/6c757d&text=Bienvenido" alt="">
+    <img class="img-fluid rounded" src="https://dummyimage.com/480x240/eff2f7/6c757d&text=Bienvenido" alt="Bienvenido">
   </div>
   <div class="col-md-4">
-    <h4 class="mb-2">Bienvenido de nuevo</h4>
-    <div class="fs-5 text-primary fw-bold" id="nombreUsuario">Usuario</div>
-    <p class="text-secondary mb-0">
-      ¡Nos alegra verte! Estamos listos para ayudarte con tus proyectos e inversiones.
-    </p>
+    <h5 class="mb-2">Bienvenido de nuevo</h5>
+    <div class="fs-4 text-primary fw-bold" id="nombreUsuario">Usuario</div>
+    <p class="text-secondary mb-0">¡Nos alegra verte! Estamos listos para ayudarte con tus proyectos e inversiones.</p>
   </div>
   <div class="col-md-4 text-center">
     <h6 class="text-muted mb-1">Hora actual en Colombia</h6>
@@ -26,7 +20,7 @@
   </div>
 </div>
 
-<div class="row g-3 mt-2">
+<div class="row g-3" id="cards">
   <div class="col-sm-6 col-lg-3">
     <div class="card"><div class="card-body d-flex align-items-center">
       <div class="flex-grow-1">
@@ -79,53 +73,59 @@
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-const API_BASE = '/api';
-
-// Nombre simulado si no hay sesión web
-const nombre = @json(session('nombre','Arturo'));
-const apellido = @json(session('apellido','Marquez'));
+const API='/api';
+const nombre = localStorage.getItem('nombre') || 'Arturo';
+const apellido = localStorage.getItem('apellido') || 'Marquez';
 document.getElementById('nombreUsuario').textContent = `${nombre} ${apellido}`;
 
 async function cargarDashboard(){
-  const res = await fetch(`${API_BASE}/dashboard/summary`);
-  const data = await res.json();
-  document.getElementById('totalProyectos').textContent = data.total_proyectos ?? 0;
-  document.getElementById('fechaMasAntigua').textContent = data.fecha_mas_antigua ?? '—';
-  document.getElementById('fechaMasNueva').textContent   = data.fecha_mas_nueva ?? '—';
-  document.getElementById('totalUsuarios').textContent   = data.total_usuarios ?? 0;
+  try{
+    const r = await fetch(`${API}/dashboard/summary`);
+    const d = await r.json();
+    totalProyectos.textContent = d.total_proyectos ?? 0;
+    fechaMasAntigua.textContent = d.fecha_mas_antigua ?? '—';
+    fechaMasNueva.textContent   = d.fecha_mas_nueva ?? '—';
+    totalUsuarios.textContent   = d.total_usuarios ?? 0;
+  }catch(e){ toastError('No se pudo cargar el dashboard'); }
 }
 
 let chart;
 function poblarAnios(){
   const sel = document.getElementById('chartYear');
-  const actual = new Date().getFullYear();
-  sel.innerHTML=''; for(let y=actual;y>=actual-5;y--){ const o=document.createElement('option'); o.value=y; o.textContent=y; sel.appendChild(o); }
-  sel.value=actual;
+  const y = new Date().getFullYear();
+  sel.innerHTML = '';
+  for(let i=y;i>=y-5;i--){
+    const o = new Option(i,i);
+    sel.add(o);
+  }
+  sel.value = y;
 }
 async function cargarGrafico(year){
-  const res = await fetch(`${API_BASE}/dashboard/proyectos-por-mes?year=${year}`);
-  const data = await res.json();
-  const options = {
-    chart:{ type:'bar', height:320, toolbar:{show:false}},
-    series:[{ name:`Empresas ${data.year}`, data:data.series }],
-    xaxis:{ categories:data.labels },
-    plotOptions:{ bar:{ borderRadius:6 }},
-    dataLabels:{ enabled:false },
-    tooltip:{ y:{ formatter:(v)=>`${v} empresas` }}
-  };
-  const el = document.querySelector('#chartProyectosMes');
-  if(chart) chart.destroy();
-  chart = new ApexCharts(el, options); chart.render();
+  try{
+    const r = await fetch(`${API}/dashboard/proyectos-por-mes?year=${year}`);
+    const d = await r.json();
+    const opts = {
+      chart:{type:'bar',height:320,toolbar:{show:false}},
+      series:[{name:`Empresas ${d.year}`,data:d.series}],
+      xaxis:{categories:d.labels},
+      plotOptions:{bar:{borderRadius:6}},
+      dataLabels:{enabled:false}
+    };
+    const el = document.getElementById('chartProyectosMes');
+    if(chart) chart.destroy();
+    chart = new ApexCharts(el, opts); chart.render();
+  }catch(e){ toastError('No se pudo cargar la gráfica'); }
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
   cargarDashboard();
   poblarAnios();
-  const sel = document.getElementById('chartYear');
+  const sel=document.getElementById('chartYear');
   cargarGrafico(sel.value);
-  sel.addEventListener('change', e=>cargarGrafico(e.target.value));
+  sel.addEventListener('change',e=>cargarGrafico(e.target.value));
 });
 </script>
-@endsection
+@endpush

@@ -1,279 +1,126 @@
 @extends('layouts.app')
-@section('title','simulacion')
-@section('page-title','simulacion')
+
+@section('title','Simulación')
+@section('page-title','Simulación')
+
 @section('content')
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <title>Simulación</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
-  <style>
-    body { background: #f8fafc; font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial; }
-    .card { border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
-    .chart { min-height: 320px; }
-    .table thead th { white-space: nowrap; }
-  </style>
-</head>
-<body>
-<div class="container py-4">
-  <div class="d-flex flex-wrap align-items-end gap-3 mb-4">
-    <div>
-      <h3 class="mb-1">Simulación</h3>
-      <div class="text-secondary">Selecciona una empresa para calcular aportes y participaciones (ajustadas por tasa).</div>
-    </div>
-    <div class="ms-auto">
-      <label class="form-label mb-1">Empresa</label>
-      <select id="selProyecto" class="form-select">
-        <option value="">Seleccione...</option>
-      </select>
-    </div>
-    <div>
-      <label class="form-label mb-1">Año (series mensuales)</label>
-      <select id="selYear" class="form-select"></select>
-    </div>
-  </div>
-
-  <!-- Tarjetas -->
-  <div class="row g-3 mb-3">
-    <div class="col-sm-6 col-lg-3">
-      <div class="card"><div class="card-body">
-        <div class="text-secondary">Usuarios vinculados</div>
-        <div class="display-6" id="cardUsuarios">0</div>
-      </div></div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="card"><div class="card-body">
-        <div class="text-secondary">Aportes capital (VF)</div>
-        <div class="h4 mb-0" id="cardCapital">$ 0</div>
-      </div></div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="card"><div class="card-body">
-        <div class="text-secondary">Aportes industria (VF)</div>
-        <div class="h4 mb-0" id="cardIndustria">$ 0</div>
-      </div></div>
-    </div>
-    <div class="col-sm-6 col-lg-3">
-      <div class="card"><div class="card-body">
-        <div class="text-secondary">Tasa ajustada</div>
-        <div class="h4 mb-0"><span id="cardTasa">0</span>%</div>
-      </div></div>
-    </div>
-  </div>
-
-  <!-- % min / avg / max -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <div class="card text-bg-light"><div class="card-body">
-        <div class="text-secondary">Participación mínima</div>
-        <div class="h4 mb-0" id="cardMin">0%</div>
-      </div></div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-bg-light"><div class="card-body">
-        <div class="text-secondary">Promedio participación</div>
-        <div class="h4 mb-0" id="cardAvg">0%</div>
-      </div></div>
-    </div>
-    <div class="col-md-4">
-      <div class="card text-bg-light"><div class="card-body">
-        <div class="text-secondary">Participación máxima</div>
-        <div class="h4 mb-0" id="cardMax">0%</div>
-      </div></div>
-    </div>
-  </div>
-
-  <!-- Gráficas -->
-  <div class="row g-3">
-    <div class="col-lg-6">
-      <div class="card"><div class="card-body">
-        <h6 class="mb-3">Aportes (Capital vs Industria) – Donut</h6>
-        <div id="chartDonut" class="chart"></div>
-      </div></div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card"><div class="card-body">
-        <h6 class="mb-3">% Participación por socio (Top → Bottom)</h6>
-        <div id="chartBarrasPct" class="chart"></div>
-      </div></div>
-    </div>
-    <div class="col-12">
-      <div class="card"><div class="card-body">
-        <h6 class="mb-3">Inversiones por mes (Capital vs Industria)</h6>
-        <div id="chartMensual" class="chart"></div>
-      </div></div>
-    </div>
-  </div>
-
-  <!-- Tabla -->
-  <div class="card mt-4">
-    <div class="card-body">
-      <h6 class="mb-3">Resumen por socio</h6>
-      <div class="table-responsive">
-        <table class="table table-striped align-middle">
-          <thead>
-            <tr>
-              <th>Socio</th>
-              <th class="text-end">Aportes Capital (VF)</th>
-              <th class="text-end">Aportes Industria (VF)</th>
-              <th class="text-end">Total (VF)</th>
-              <th class="text-center">% Participación</th>
-            </tr>
-          </thead>
-          <tbody id="tbodySocios"></tbody>
-          <tfoot>
-            <tr>
-              <th>TOTALES</th>
-              <th class="text-end" id="tCap">$ 0</th>
-              <th class="text-end" id="tInd">$ 0</th>
-              <th class="text-end" id="tTot">$ 0</th>
-              <th class="text-center">100%</th>
-            </tr>
-          </tfoot>
-        </table>
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-3 align-items-end">
+      <div class="col-sm-6">
+        <label class="form-label">Proyecto</label>
+        <select id="selProyecto" class="form-select"></select>
+      </div>
+      <div class="col-sm-6 d-flex gap-2">
+        <button class="btn btn-primary" onclick="cargar()">Calcular</button>
+        <button class="btn btn-outline-secondary" onclick="limpiar()">Limpiar</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">Aportes por tipo (%)</h6>
+      <div id="chartTipos"></div>
+    </div></div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">Usuarios vinculados</h6>
+      <div id="chartUsuarios"></div>
+    </div></div>
+  </div>
+  <div class="col-12">
+    <div class="card"><div class="card-body">
+      <h6 class="mb-3">Inversiones por mes</h6>
+      <div id="chartMes"></div>
+    </div></div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <h6 class="mb-3">Resumen</h6>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr>
+          <th>Socio</th><th class="text-end">Capital</th><th class="text-end">Industria</th><th class="text-end">Total</th><th class="text-center">%</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+        <tfoot><tr>
+          <th>Totales</th>
+          <th id="tCap" class="text-end">—</th>
+          <th id="tInd" class="text-end">—</th>
+          <th id="tTot" class="text-end">—</th>
+          <th class="text-center">100%</th>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+@endsection
+
+@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-const API = '/api';
-let donut, barrasPct, mensual;
+const API='/api', $=s=>document.querySelector(s);
+let chartTipos, chartUsuarios, chartMes;
 
-function money(n){ return n.toLocaleString('es-CO', {style:'currency', currency:'COP', maximumFractionDigits:0}); }
-function pct(n){ return (n ?? 0).toLocaleString('es-CO', {maximumFractionDigits:2}) + '%'; }
-
-async function loadProyectos() {
-  const sel = document.getElementById('selProyecto');
-  sel.innerHTML = '<option value="">Seleccione...</option>';
-  const res = await fetch(`${API}/catalogos/proyectos-no-liquidados`);
-  const items = await res.json();
-  for (const p of items) {
-    const opt = document.createElement('option');
-    opt.value = p.ID_Proyecto;
-    opt.textContent = p.Nombre;
-    sel.appendChild(opt);
-  }
+async function cargarCatalogo(){
+  const r = await fetch(`${API}/catalogos/proyectos-no-liquidados`);
+  const d = await r.json();
+  selProyecto.innerHTML = `<option value="">Seleccione...</option>`;
+  (d||[]).forEach(p=> selProyecto.add(new Option(`${p.ID_Proyecto} - ${p.Nombre}`, p.ID_Proyecto)));
 }
-
-function loadYears() {
-  const y = document.getElementById('selYear');
-  const cur = new Date().getFullYear();
-  for (let a = cur; a >= cur - 5; a--) {
-    const opt = document.createElement('option');
-    opt.value = a; opt.textContent = a;
-    y.appendChild(opt);
-  }
-  y.value = cur;
+function limpiar(){
+  $('#tbody').innerHTML=''; tCap.textContent=tInd.textContent=tTot.textContent='—';
+  if(chartTipos) chartTipos.destroy(); if(chartUsuarios) chartUsuarios.destroy(); if(chartMes) chartMes.destroy();
 }
+async function cargar(){
+  const id = selProyecto.value; if(!id) return toastWarn('Selecciona un proyecto');
+  try{
+    const r = await fetch(`${API}/simulaciones/resumen?proyecto=${id}`); // Implementa este endpoint en tu SimulacionController
+    const d = await r.json();
 
-async function loadResumen() {
-  const proyecto_id = document.getElementById('selProyecto').value;
-  const year = document.getElementById('selYear').value;
-  if (!proyecto_id) return;
+    // tabla
+    const tb=$('#tbody'); tb.innerHTML=''; 
+    let cap=0, ind=0, tot=0;
+    d.detalle.forEach(x=>{
+      cap+=x.capital; ind+=x.industria; tot+=x.capital+x.industria;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${x.nombre}</td>
+        <td class="text-end">${fmt(x.capital)}</td>
+        <td class="text-end">${fmt(x.industria)}</td>
+        <td class="text-end">${fmt(x.capital+x.industria)}</td>
+        <td class="text-center">${(x.porcentaje||0).toFixed(2)}%</td>`;
+      tb.appendChild(tr);
+    });
+    tCap.textContent=fmt(cap); tInd.textContent=fmt(ind); tTot.textContent=fmt(tot);
 
-  const url = new URL(`${API}/simulacion/resumen`, window.location.origin);
-  url.searchParams.set('proyecto_id', proyecto_id);
-  url.searchParams.set('year', year);
+    // charts
+    chartTipos = renderPie('chartTipos', ['Capital','Industria'], [d.porcentajes.capital, d.porcentajes.industria]);
+    chartUsuarios = renderRadial('chartUsuarios', d.usuarios_vinculados || 0);
+    chartMes = renderBar('chartMes', d.mensual.labels, d.mensual.series, 'Inversiones');
 
-  const res = await fetch(url);
-  if (!res.ok) { alert('No se pudo calcular la simulación'); return; }
-  const data = await res.json();
-
-  // Tarjetas
-  document.getElementById('cardUsuarios').textContent = data.cards.cantidad_usuarios ?? 0;
-  document.getElementById('cardCapital').textContent  = money(data.cards.valor_aportes_capital ?? 0);
-  document.getElementById('cardIndustria').textContent= money(data.cards.valor_aportes_industria ?? 0);
-  document.getElementById('cardTasa').textContent     = (data.tasa_ajustada ?? 0);
-
-  document.getElementById('cardMin').textContent = pct(data.cards.participacion_minima);
-  document.getElementById('cardAvg').textContent = pct(data.cards.promedio_participacion);
-  document.getElementById('cardMax').textContent = pct(data.cards.participacion_maxima);
-
-  // Donut
-  const dSeries = data.series.aportes_donut.data;
-  const dLabels = data.series.aportes_donut.labels;
-  const donutOpt = {
-    chart: { type: 'donut', height: 320 },
-    series: dSeries,
-    labels: dLabels,
-    dataLabels: { enabled: true, formatter: (val) => val.toFixed(1) + '%' },
-    tooltip: { y: { formatter: (val) => money(val) } },
-    legend: { position: 'bottom' }
-  };
-  if (donut) donut.destroy();
-  donut = new ApexCharts(document.querySelector('#chartDonut'), donutOpt);
-  donut.render();
-
-  // Barras % por socio
-  const b = data.series.usuarios_porcentaje;
-  const barrasOpt = {
-    chart: { type: 'bar', height: 320 },
-    series: [{ name: '%', data: b.data }],
-    xaxis: { categories: b.labels },
-    plotOptions: { bar: { borderRadius: 6, horizontal: true } },
-    dataLabels: { enabled: false },
-    tooltip: { y: { formatter: (v) => v.toFixed(2) + '%' } }
-  };
-  if (barrasPct) barrasPct.destroy();
-  barrasPct = new ApexCharts(document.querySelector('#chartBarrasPct'), barrasOpt);
-  barrasPct.render();
-
-  // Mensual capital vs industria
-  const m = data.series.mensual;
-  const mensualOpt = {
-    chart: { type: 'area', height: 320 },
-    series: [
-      { name: 'Capital', data: m.capital },
-      { name: 'Industria', data: m.industria }
-    ],
-    xaxis: { categories: m.labels },
-    dataLabels: { enabled: false },
-    stroke: { curve: 'smooth', width: 2 },
-    tooltip: { y: { formatter: (v) => money(v) } }
-  };
-  if (mensual) mensual.destroy();
-  mensual = new ApexCharts(document.querySelector('#chartMensual'), mensualOpt);
-  mensual.render();
-
-  // Tabla
-  const tbody = document.getElementById('tbodySocios');
-  tbody.innerHTML = '';
-  let sumCap = 0, sumInd = 0, sumTot = 0;
-  for (const row of data.tabla) {
-    sumCap += row.Capital; sumInd += row.Industria; sumTot += row.Total;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${row.Nombre}</td>
-      <td class="text-end">${money(row.Capital)}</td>
-      <td class="text-end">${money(row.Industria)}</td>
-      <td class="text-end">${money(row.Total)}</td>
-      <td class="text-center">${row.Porcentaje.toFixed(2)}%</td>
-    `;
-    tbody.appendChild(tr);
-  }
-  document.getElementById('tCap').textContent = money(sumCap);
-  document.getElementById('tInd').textContent = money(sumInd);
-  document.getElementById('tTot').textContent = money(sumTot);
+    toastSuccess('Simulación lista');
+  }catch(e){ toastError('No se pudo simular'); }
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-  loadYears();
-  await loadProyectos();
-
-  document.getElementById('selProyecto').addEventListener('change', loadResumen);
-  document.getElementById('selYear').addEventListener('change', loadResumen);
-});
+function fmt(n){ return new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(n||0); }
+function renderPie(el,labels,series){
+  const o={chart:{type:'donut',height:280},labels,series,legend:{position:'bottom'},dataLabels:{enabled:true}};
+  const c=new ApexCharts(document.getElementById(el),o); c.render(); return c;
+}
+function renderRadial(el,value){
+  const o={chart:{height:280,type:'radialBar'},series:[value],labels:['Usuarios'],plotOptions:{radialBar:{dataLabels:{value:{formatter:v=>v}}}}};
+  const c=new ApexCharts(document.getElementById(el),o); c.render(); return c;
+}
+function renderBar(el,categories,series,name){
+  const o={chart:{type:'bar',height:300},xaxis:{categories},series:[{name,data:series}],dataLabels:{enabled:false}};
+  const c=new ApexCharts(document.getElementById(el),o); c.render(); return c;
+}
+document.addEventListener('DOMContentLoaded', cargarCatalogo);
 </script>
-</body>
-</html>
-@endsection('content')
+@endpush
