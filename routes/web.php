@@ -20,6 +20,16 @@ Route::view('/registro', 'registro.index')->name('registro.index');
 Route::view('/consultas', 'consultas.index')->name('consultas.index');
 Route::view('/tipos-inversion', 'tipos-inversion.index')->name('tipos-inversion.index');
 Route::view('/ubicacion', 'ubicacion.index')->name('ubicacion.index');
+Route::view('/usuarios', 'usuarios.index')->name('usuarios.index');
+
+// Inversionista (vista)
+Route::view('/inversionista', 'inversionista.index')->name('inversionista.index');
+use App\Http\Controllers\Inversionista\ReporteInversionesController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/inversionista/inversiones-anuales', [ReporteInversionesController::class, 'inversionesAnuales'])
+        ->name('inversionista.inversiones.anuales');
+});
 
 
 

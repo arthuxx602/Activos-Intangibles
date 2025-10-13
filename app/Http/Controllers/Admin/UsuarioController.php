@@ -4,142 +4,105 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Usuario;
+use App\Models\Rol;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class UsuarioController extends Controller
 {
-    // PUT /api/usuarios/{usuario}
+    /**
+     * GET /api/usuarios
+     * Filtros: ?search=..., ?from=YYYY-MM-DD, ?to=YYYY-MM-DD, ?rol=ID, ?municipio=ID
+     */
+    public function index(Request $r)
+    {
+        $q = Usuario::query()->with(['municipio','rol']);
+
+        if ($r->filled('search')) {
+            $s = $r->string('search');
+            $q->where(function($qq) use ($s) {
+                $qq->where('ID_Usuario', 'like', "%{$s}%")
+                   ->orWhere('Nombre', 'like', "%{$s}%")
+                   ->orWhere('Apellido', 'like', "%{$s}%")
+                   ->orWhere('Correo', 'like', "%{$s}%");
+            });
+        }
+        if ($r->filled('from')) $q->whereDate('Fecha', '>=', $r->date('from'));
+        if ($r->filled('to'))   $q->whereDate('Fecha', '<=', $r->date('to'));
+        if ($r->filled('rol'))  $q->where('FK_ID_Rol', $r->input('rol'));
+        if ($r->filled('municipio')) $q->where('FK_ID_Municipio', $r->input('municipio'));
+
+        $per = (int) $r->input('per_page', 20);
+        return $q->orderByDesc('Fecha')->paginate($per);
+    }
+
+    /** GET /api/usuarios/{usuario} */
+    public function show(Usuario $usuario)
+    {
+        return $usuario->load(['municipio','rol']);
+    }
+
+    /** POST /api/usuarios */
+    public function store(Request $r)
+    {
+        $data = $r->validate([
+            'ID_Usuario'      => 'required|integer|unique:usuario2,ID_Usuario',
+            'Nombre'          => 'required|string|max:120',
+            'Apellido'        => 'required|string|max:120',
+            'Telefono'        => 'required|string|max:50',
+            'Correo'          => 'required|email|max:190|unique:usuario2,Correo',
+            'Contraseña'      => 'required|string|max:190',   // legacy (sin hash)
+            'Fecha'           => 'required|date',
+            'FK_ID_Municipio' => 'required|integer|exists:municipio,ID_Municipio',
+            'FK_ID_Rol'       => 'required|integer|exists:rol,ID_Rol',
+        ]);
+
+        $usuario = Usuario::create($data);
+
+        return response()->json([
+            'message' => 'Usuario creado correctamente.',
+            'data'    => $usuario->fresh()->load(['municipio','rol']),
+        ], 201);
+    }
+
+    /** PUT /api/usuarios/{usuario} */
     public function update(Request $r, Usuario $usuario)
     {
-        // Validación (ajusta reglas si tus columnas permiten otros tamaños)
         $data = $r->validate([
-            'Nombre'           => 'required|string|max:150',
-            'Apellido'         => 'required|string|max:150',
-            'Telefono'         => 'required|string|max:50',
-            'Correo'           => [
-                'required', 'string', 'email', 'max:190',
-                // evita duplicados de correo en otros usuarios
-                Rule::unique('usuario2', 'Correo')->ignore($usuario->getKey(), $usuario->getKeyName()),
-            ],
-            // si viene contraseña, la cambiamos; si no, se mantiene
-            'Contraseña'       => 'nullable|string|min:6|max:190',
-            'FK_ID_Municipio'  => 'required|integer|exists:municipio,ID_Municipio',
+            'Nombre'          => 'sometimes|required|string|max:120',
+            'Apellido'        => 'sometimes|required|string|max:120',
+            'Telefono'        => 'sometimes|required|string|max:50',
+            'Correo'          => 'sometimes|required|email|max:190|unique:usuario2,Correo,'.$usuario->ID_Usuario.',ID_Usuario',
+            'Contraseña'      => 'sometimes|required|string|max:190',  // legacy
+            'Fecha'           => 'sometimes|required|date',
+            'FK_ID_Municipio' => 'sometimes|required|integer|exists:municipio,ID_Municipio',
+            'FK_ID_Rol'       => 'sometimes|required|integer|exists:rol,ID_Rol',
         ]);
 
-        // Asignación simple
-        $usuario->Nombre          = $data['Nombre'];
-        $usuario->Apellido        = $data['Apellido'];
-        $usuario->Telefono        = $data['Telefono'];
-        $usuario->Correo          = $data['Correo'];
-        $usuario->FK_ID_Municipio = $data['FK_ID_Municipio'];
-
-        // Solo si vino una nueva contraseña
-        if (!empty($data['Contraseña'])) {
-            // ⚠️ Recomendado: almacenar hasheada (mucho más seguro)
-            $usuario->{'Contraseña'} = Hash::make($data['Contraseña']);
-            // Si NECESITAS mantenerla en texto plano por compatibilidad (no recomendado):
-            // $usuario->{'Contraseña'} = $data['Contraseña'];
-        }
-
-        $usuario->save();
+        $usuario->update($data);
 
         return response()->json([
-            'message' => 'Usuario actualizado exitosamente.',
-            'data'    => $usuario->fresh(),
-        ], 200);
-    }
-
-    // OPCIONAL: endpoint compatible con tu form legacy (POST con nombres originales)
-    // POST /api/usuarios/update-legacy
-    public function updateLegacy(Request $r)
-    {
-        $data = $r->validate([
-            'id_usuario'        => 'required|integer|exists:usuario2,ID_Usuario',
-            'nombre_usuario'    => 'required|string|max:150',
-            'apellido_usuario'  => 'required|string|max:150',
-            'telefono_usuario'  => 'required|string|max:50',
-            'correo_usuario'    => [
-                'required','string','email','max:190',
-                Rule::unique('usuario2', 'Correo')->ignore($r->integer('id_usuario'), 'ID_Usuario'),
-            ],
-            'contraseña_usuario'=> 'nullable|string|min:6|max:190',
-            'municipio_usuario' => 'required|integer|exists:municipio,ID_Municipio',
-        ]);
-
-        $usuario = Usuario::findOrFail($data['id_usuario']);
-        $usuario->Nombre          = $data['nombre_usuario'];
-        $usuario->Apellido        = $data['apellido_usuario'];
-        $usuario->Telefono        = $data['telefono_usuario'];
-        $usuario->Correo          = $data['correo_usuario'];
-        $usuario->FK_ID_Municipio = $data['municipio_usuario'];
-
-        if (!empty($data['contraseña_usuario'])) {
-            $usuario->{'Contraseña'} = Hash::make($data['contraseña_usuario']);
-            // (o en texto plano si te ves obligado, no recomendado)
-        }
-
-        $usuario->save();
-
-        return response()->json([
-            'message' => 'Usuario actualizado exitosamente.',
-            'data'    => $usuario,
+            'message' => 'Usuario actualizado.',
+            'data'    => $usuario->fresh()->load(['municipio','rol']),
         ]);
     }
-     public function destroy(Usuario $usuario)
+
+    /** DELETE /api/usuarios/{usuario} */
+    public function destroy(Usuario $usuario)
     {
-        $tieneVinculos = DB::table('proyecto_usuario')
-            ->where('FK_ID_Usuario', $usuario->ID_Usuario)
-            ->exists();
-
-        if ($tieneVinculos) {
-            return response()->json([
-                'message' => 'El usuario no puede ser eliminado porque está vinculado a un proyecto/empresa.'
-            ], 409); // 409 Conflict
-        }
-
+        $id = $usuario->ID_Usuario;
         $usuario->delete();
 
         return response()->json([
-            'message' => 'Usuario eliminado exitosamente.',
-            'id' => $usuario->ID_Usuario,
-        ], 200);
+            'message' => 'Usuario eliminado.',
+            'id'      => $id,
+        ]);
     }
 
     /**
-     * (Opcional) DELETE /api/usuarios  con body: { "ids": [..] }
-     * Elimina en bloque los que NO tengan vínculos y reporta los bloqueados.
+     * Catálogo de roles para selects: GET /api/catalogos/roles
      */
-    public function destroyMany(Request $r)
+    public function rolesCatalogo()
     {
-        $data = $r->validate([
-            'ids'   => 'required|array|min:1',
-            'ids.*' => 'integer|exists:usuario2,ID_Usuario',
-        ]);
-
-        $ids = $data['ids'];
-
-        // Separar vinculados vs no vinculados
-        $vinculados = DB::table('proyecto_usuario')
-            ->whereIn('FK_ID_Usuario', $ids)
-            ->pluck('FK_ID_Usuario')
-            ->unique()
-            ->map(fn($v) => (int)$v)
-            ->all();
-
-        $eliminables = array_values(array_diff($ids, $vinculados));
-
-        // Eliminar los no vinculados
-        if (!empty($eliminables)) {
-            DB::table('usuario2')->whereIn('ID_Usuario', $eliminables)->delete();
-        }
-
-        return response()->json([
-            'eliminados'  => $eliminables,
-            'bloqueados'  => $vinculados,
-            'message'     => 'Operación completada.',
-        ]);
+        return Rol::orderBy('Nombre')->get(['ID_Rol','Nombre']);
     }
 }
-

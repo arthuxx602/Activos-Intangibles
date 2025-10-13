@@ -8,7 +8,6 @@ use App\Http\Controllers\Admin\{
     AdminController,
     ConsultaController,
     DescargaController,
-   // DepartamentoController,
     DashboardController,
     EmpresaController,
     InversionController,
@@ -18,16 +17,37 @@ use App\Http\Controllers\Admin\{
     ProyectoController,
     SimulacionController,
     TasaController,
-   // TipoInversionController,
     UbicacionController,
     UsuarioController,
     VinculacionController
 };
 
+//esta en el modulo inversionista 
+use App\Http\Controllers\inversionista;
+use App\Http\Controllers\InversionistaController;
+use App\Http\Controllers\Inversionista\ReporteInversionesController;
 
-// OJO: TipoInversionController NO está en Admin
+{
+   
+
+// Catálogos
+Route::get('/inversionista/catalogos', [InversionistaController::class, 'catalogos']);
+
+// Resumen + detalle
+Route::get('/inversionista/resumen',   [InversionistaController::class, 'resumen']);
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/inversionista/inversiones-anuales', [ReporteInversionesController::class, 'inversionesAnuales']);
+});
+
+}
+
+// Import DepartamentoController from the correct namespace if not in Admin //  estan en admin 
+use App\Http\Controllers\DepartamentoController;
+
+
+// OJO: TipoInversionController NO está en Admin // estan en admin 
 use App\Http\Controllers\TipoInversionController;
-use App\Http\Controllers\Admin\DepartamentoController;
 // =====================================================
 // RUTA DE PRUEBA
 // =====================================================
@@ -43,7 +63,7 @@ Route::apiResource('proyectos',       ProyectoController::class);
 Route::apiResource('inversiones',     InversionController::class);
 Route::apiResource('empresas',        EmpresaController::class);
 Route::apiResource('paises',          PaisController::class);
-//Route::apiResource('departamentos',   DepartamentoController::class);
+//Route::apiResource('departamentos',   DepartamentoController::class);// aun persiste el error de departamento 
 Route::apiResource('municipios',      MunicipioController::class);
 Route::apiResource('tipos-inversion', TipoInversionController::class);
 Route::apiResource('tasas',           TasaController::class);
@@ -75,6 +95,8 @@ Route::get('catalogos/proyectos-no-liquidados', [ConsultaController::class, 'pro
 Route::get('catalogos/usuarios-para-vincular',  [ConsultaController::class, 'usuariosParaVincular']);
 Route::get('simulacion/resumen',                [SimulacionController::class, 'resumen']); // ?proyecto_id=123
 Route::get('tasas/ultima',                      [TasaController::class, 'ultima']);
+// Catálogo para selects
+Route::get('catalogos/roles', [UsuarioController::class, 'rolesCatalogo']);
 
 // =====================================================
 // VINCULACIONES (pivot proyecto_usuario)
