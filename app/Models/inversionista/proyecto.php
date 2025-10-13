@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Inversionista;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,10 +10,5 @@ class Proyecto extends Model
     protected $primaryKey = 'ID_Proyecto';
     public $timestamps = false;
 
-    protected $fillable = ['ID_Proyecto','Nombre','Fecha','Descripcion','Certificado','liquidado'];
-
-    public function inversiones()
-    {
-        return $this->hasMany(Inversion::class, 'FK_ID_Proyecto', 'ID_Proyecto');
-    }
+    protected $fillable = ['Nombre','Fecha','Descripcion','Certificado','liquidado','Certificado_L'];
 }

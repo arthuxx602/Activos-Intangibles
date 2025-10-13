@@ -26,6 +26,8 @@ use App\Http\Controllers\Admin\{
 use App\Http\Controllers\inversionista;
 use App\Http\Controllers\InversionistaController;
 use App\Http\Controllers\Inversionista\ReporteInversionesController;
+use App\Http\Controllers\Inversionista\ReporteController;
+use App\Http\Controllers\Inversionista\DashboardController as InvDash;
 
 {
    
@@ -39,6 +41,8 @@ Route::get('/inversionista/resumen',   [InversionistaController::class, 'resumen
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/inversionista/inversiones-anuales', [ReporteInversionesController::class, 'inversionesAnuales']);
 });
+Route::get('/inversionista/datos-line-anual', [ReporteController::class, 'datosLineAnual']);
+Route::get('/inversionista/resumen', [InvDash::class, 'resumen']);
 
 }
 

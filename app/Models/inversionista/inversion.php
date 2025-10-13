@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Inversionista;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,27 +11,12 @@ class Inversion extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'Nombre', 'Monto', 'Monto_Ajustado', 'Proyecto', 'Tipo', 'Fecha',
-        'Descripcion', 'CertificadoInversion', 'FK_ID_Usuario', 'FK_ID_Tipo', 'FK_ID_Proyecto'
+        'Nombre','Monto','Monto_Ajustado','Proyecto','Tipo','Fecha',
+        'Descripcion','CertificadoInversion','FK_ID_Usuario','FK_ID_Tipo','FK_ID_Proyecto'
     ];
 
     protected $casts = [
         'Fecha' => 'date:Y-m-d',
-        'Monto' => 'float'
+        'Monto' => 'decimal:2',
     ];
-
-    public function usuario()
-    {
-        return $this->belongsTo(Usuario::class, 'FK_ID_Usuario', 'ID_Usuario');
-    }
-
-    public function proyecto()
-    {
-        return $this->belongsTo(Proyecto::class, 'FK_ID_Proyecto', 'ID_Proyecto');
-    }
-
-    public function tipo()
-    {
-        return $this->belongsTo(TipoInversion::class, 'FK_ID_Tipo', 'ID_TIPO');
-    }
 }

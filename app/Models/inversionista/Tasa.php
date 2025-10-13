@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Inversionista;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,9 +11,4 @@ class Tasa extends Model
     public $timestamps = false;
 
     protected $fillable = ['Tasa','Fecha'];
-
-    public static function ultimaTasa(): float
-    {
-        return (float) static::orderByDesc('Id')->value('Tasa') ?? 0.0;
-    }
 }

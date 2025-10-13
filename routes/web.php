@@ -2,6 +2,7 @@
 
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Inversionista\ReporteController;
 
 // VISTAS (Blade)
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');   
@@ -14,7 +15,7 @@ Route::view('/tasas', 'tasas.index')->name('tasas.index');
 Route::view('/simulacion', 'simulacion.index')->name('simulacion.index');
 
 Route::view('/liquidacion', 'liquidacion.index')->name('liquidacion.index');
-Route::view('/liquidar-proyecto', 'liquidar-proyecto.index')->name('liquidar-proyecto.index'); // 👈 NUEVA
+Route::view('/liquidar-proyecto', 'liquidar-proyecto.index')->name('liquidar-proyecto.index'); 
 
 Route::view('/registro', 'registro.index')->name('registro.index'); 
 Route::view('/consultas', 'consultas.index')->name('consultas.index');
@@ -24,12 +25,13 @@ Route::view('/usuarios', 'usuarios.index')->name('usuarios.index');
 
 // Inversionista (vista)
 Route::view('/inversionista', 'inversionista.index')->name('inversionista.index');
-use App\Http\Controllers\Inversionista\ReporteInversionesController;
+use App\Http\Controllers\Inversionista\DashboardController as InvDash;
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/inversionista/inversiones-anuales', [ReporteInversionesController::class, 'inversionesAnuales'])
-        ->name('inversionista.inversiones.anuales');
-});
+Route::get('/inversionista', [InvDash::class, 'index'])->name('inversionista.index');
+use App\Http\Controllers\Inversionista\ReporteInversionesController;
+// Vista del reporte anual
+Route::get('/inversionista/reportes/line-anual', [ReporteController::class, 'lineAnual'])
+    ->name('inversionista.reportes.line-anual');
 
 
 
