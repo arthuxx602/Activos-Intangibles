@@ -28,6 +28,7 @@ use App\Http\Controllers\InversionistaController;
 use App\Http\Controllers\Inversionista\ReporteInversionesController;
 use App\Http\Controllers\Inversionista\ReporteController;
 use App\Http\Controllers\Inversionista\DashboardController as InvDash;
+use App\Http\Controllers\Inversionista\LiquidacionController as InvLiquidacion;
 
 {
    
@@ -43,6 +44,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 Route::get('/inversionista/datos-line-anual', [ReporteController::class, 'datosLineAnual']);
 Route::get('/inversionista/resumen', [InvDash::class, 'resumen']);
+Route::get('/inversionista/liquidacion/resumen', [InvLiquidacion::class, 'resumen']);
 
 }
 
