@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ubicacion;
 use Illuminate\Http\Request;
+use App\Models\Pais;
+use App\Models\Departamento;
+use App\Models\Municipio;
+
 
 class UbicacionController extends Controller
 {
