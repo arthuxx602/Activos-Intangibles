@@ -2,6 +2,7 @@
 
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TipoInversionController;
 use App\Http\Controllers\Inversionista\ReporteController;
 
 // VISTAS (Blade)
@@ -20,6 +21,13 @@ Route::view('/liquidar-proyecto', 'liquidar-proyecto.index')->name('liquidar-pro
 Route::view('/registro', 'registro.index')->name('registro.index'); 
 Route::view('/consultas', 'consultas.index')->name('consultas.index');
 Route::view('/tipos-inversion', 'tipos-inversion.index')->name('tipos-inversion.index');
+
+
+Route::middleware('auth')->group(function () {
+    Route::resource('tipos', TipoInversionController::class);
+    Route::get('/', fn() => redirect()->route('tipos.index'))->name('dashboard');
+});
+
 Route::view('/ubicacion', 'ubicacion.index')->name('ubicacion.index');
 Route::view('/usuarios', 'usuarios.index')->name('usuarios.index');
 

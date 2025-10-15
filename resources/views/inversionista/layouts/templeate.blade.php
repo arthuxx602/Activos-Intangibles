@@ -20,7 +20,14 @@
        class="{{ request()->routeIs('inversionista.resumen') ? 'active' : '' }}">
       <i class="bi bi-table me-2"></i> Resumen
     </a>
+    <a href="{{ route('tipos.index') }}">Tipos de inversiones</a>
+   
   </nav>
+  <form method="POST" action="{{ route('logout') }}">
+    @csrf
+    <button class="btn btn-outline-secondary btn-sm">Salir</button>
+</form>
+
 @endsection
 
 {{-- Parte derecha del topbar (inicial + nombre y logout opcional) --}}

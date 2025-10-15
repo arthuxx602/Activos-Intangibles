@@ -9,9 +9,13 @@ class TipoInversion extends Model
 {
     use HasFactory;
 
-    protected $table = 'tipo'; // coincide con tu base de datos legacy
-    protected $primaryKey = 'ID_Tipo';
+    protected $table = 'tipo'; // Nombre real de la tabla
+    protected $primaryKey = 'ID_TIPO';
     public $timestamps = false;
 
-    protected $fillable = ['Nombre', 'Descripcion'];
+    protected $fillable = [
+        'Nombre',
+        'Descripcion',
+    ];
 }
+
