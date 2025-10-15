@@ -26,14 +26,17 @@ Route::view('/usuarios', 'usuarios.index')->name('usuarios.index');
 // Inversionista (vista)
 Route::view('/inversionista', 'inversionista.index')->name('inversionista.index');
 use App\Http\Controllers\Inversionista\DashboardController as InvDash;
-
-Route::get('/inversionista', [InvDash::class, 'index'])->name('inversionista.index');
+use App\Http\Controllers\Inversionista\ResumenController;
 use App\Http\Controllers\Inversionista\ReporteInversionesController;
 use App\Http\Controllers\Inversionista\LiquidacionController as InvLiquidacion;
+
+Route::get('/inversionista', [InvDash::class, 'index'])->name('inversionista.index');
 
 Route::get('/inversionista/liquidacion', [InvLiquidacion::class, 'index'])
     ->name('inversionista.liquidacion.index');
 
+Route::get('/inversionista/resumen', [ResumenController::class, 'index'])
+    ->name('inversionista.resumen');
 // Vista del reporte anual
 Route::get('/inversionista/reportes/line-anual', [ReporteController::class, 'lineAnual'])
     ->name('inversionista.reportes.line-anual');
