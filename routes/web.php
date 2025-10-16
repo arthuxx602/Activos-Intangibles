@@ -4,6 +4,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TipoInversionController;
 use App\Http\Controllers\Inversionista\ReporteController;
+use App\Http\Controllers\Moderador\UsuarioController;
+use App\Http\Controllers\Moderador\InversionController;
 
 // VISTAS (Blade)
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');   
@@ -49,6 +51,25 @@ Route::get('/inversionista/resumen', [ResumenController::class, 'index'])
 Route::get('/inversionista/reportes/line-anual', [ReporteController::class, 'lineAnual'])
     ->name('inversionista.reportes.line-anual');
 
+    //vista moderador 
+Route::middleware('auth')
+  ->prefix('moderador')
+  ->name('moderador.')
+  ->group(function () {
+      // Usuarios 
+      Route::get('usuarios',  [UsuarioController::class, 'index'])->name('usuarios.index');
+      Route::post('usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
+
+      // Inversiones
+      Route::get('inversiones',  [InversionController::class, 'index'])->name('inversiones.index');
+      Route::post('inversiones', [InversionController::class, 'store'])->name('inversiones.store');
+
+     // Form para registrar inversión con PDF (reemplazo de registrarM para inversiones)
+      Route::get('inversiones/registrar',  [InversionDocumentoController::class, 'create'])->name('inversiones.docs.create');
+      Route::post('inversiones/registrar', [InversionDocumentoController::class, 'store'])->name('inversiones.docs.store');
+     // Listado de inversiones con certificado (inversion2)
+      Route::get('inversiones/docs', [InversionDocumentoController::class, 'index'])->name('inversiones.docs.index');
+  });
 
 
 // Home por defecto
