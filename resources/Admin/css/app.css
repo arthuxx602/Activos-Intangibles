@@ -1,0 +1,17 @@
+/*@import 'tailwindcss';*/
+
+/* Removed invalid @source rules */
+/* Tailwind (si lo usas) */
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+/* Tus hojas personalizadas */
+@import "./media.css";   /* si ya migraste media.css */
+@import "./style.css";   /* <--- el que acabas de crear */
+
+
+:root {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}

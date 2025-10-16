@@ -7,6 +7,8 @@ use App\Http\Controllers\Inversionista\ReporteController;
 use App\Http\Controllers\Moderador\UsuarioController;
 use App\Http\Controllers\Moderador\InversionController;
 use App\Http\Controllers\Moderador\HomeController;
+use App\Http\Controllers\Moderador\EstadisticasController;
+use App\Http\Controllers\Moderador\ConsultasController;
 
 // VISTAS (Blade)
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');   
@@ -72,6 +74,17 @@ Route::middleware('auth')
       Route::get('inversiones/docs', [InversionDocumentoController::class, 'index'])->name('inversiones.docs.index');
     // ruta home controlador 
     Route::get('/', [HomeController::class, 'index'])->name('inicio');
+    //ruta datos 
+    // Endpoint JSON (reemplaza datosLine.php)
+    Route::get('estadisticas/datos-line', [EstadisticasController::class, 'datosLine'])
+         ->name('estadisticas.datos-line');
+    // Página principal de consultas (form + resultados)
+      Route::get('consultas',  [ConsultasController::class, 'index'])->name('consultas.index');
+      Route::post('consultas', [ConsultasController::class, 'consultar'])->name('consultas.consultar');
+    // AJAX: proyectos por usuario (devuelve <option>…)
+      Route::get('consultas/proyectos', [ConsultasController::class, 'proyectosPorUsuario'])
+           ->name('consultas.proyectos-usuario'); // ?usuario_id=123
+
   });
 
 

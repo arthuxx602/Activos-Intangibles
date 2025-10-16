@@ -5,6 +5,13 @@
   <title>@yield('title', 'Panel Moderador')</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   @vite(['resources/css/app.css','resources/js/app.js'])
+  @vite(['resources/css/app.css', 'resources/css/style.css'])
+  @vite(['resources/css/app.css', 'resources/moderador/app.css'])
+  @vite(['resources/css/app.css', 'resources/moderador/media.css'])
+
+
+
+
   <style>
     .user-icon{
       display:inline-block;width:40px;height:40px;border-radius:50%;
@@ -245,3 +252,5 @@
   </script>
 </body>
 </html>
+@import './style.css';
+@import './media.css';

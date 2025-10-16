@@ -1,0 +1,144 @@
+/* ==============================================================
+   Media css (Laravel 12 + Layout Moderador)
+   Ajustado para sidebar de 260px y header de 56px
+   ============================================================== */
+
+:root{
+  --sidebar-w: 260px;   /* ancho sidebar */
+  --header-h: 56px;     /* alto header */
+  --gap-main: 16px;     /* padding lateral base */
+}
+
+/* Helpers base (coinciden con el layout) */
+.header{
+  /* width se recalcula por media queries */
+}
+.brand-logo{ width: var(--sidebar-w); }
+.left-side-bar{ width: var(--sidebar-w); }
+.main-container{
+  padding-left: calc(var(--sidebar-w) + var(--gap-main));
+}
+
+/* ================= breakpoints ================= */
+
+/* <= 1400 (ajuste menor para monitores grandes) */
+@media (max-width: 1400px){
+  /* reduce el padding lateral y el espacio entre widgets */
+  .main-container{ padding-left: 12px; padding-right: 12px; }
+  .card-box{ margin-bottom: 18px; }
+  .widget-style3 .font-24{ font-size: 1.3rem; }
+}
+
+/* 1301–1400 */
+@media (min-width: 1301px) and (max-width: 1400px){
+  .header{ width: calc(100% - var(--sidebar-w)); }
+  .brand-logo{ width: var(--sidebar-w); }
+  .left-side-bar{ width: var(--sidebar-w); }
+  .main-container{ padding-left: calc(var(--sidebar-w) + var(--gap-main)); }
+}
+
+/* 1200–1400 (ejemplo de widget a ancho completo) */
+@media (min-width: 1200px) and (max-width: 1400px){
+  .device-usage-chart .width-50-p{ width: 100%; }
+}
+
+/* >= 1301 con “sidebar-shrink” (cuando escondes el lateral en desktop) */
+@media (min-width: 1301px){
+  .sidebar-shrink .left-side-bar.open,
+  .sidebar-shrink .left-side-bar{
+    left: calc(-1 * var(--sidebar-w));
+  }
+  .sidebar-shrink .header{ width: 100%; }
+  .sidebar-shrink .main-container{ padding-left: var(--gap-main); }
+}
+
+/* <= 1300 (modo tablet/laptop angosta, sidebar oculto por defecto) */
+@media (max-width: 1300px){
+  .main-container{ padding-left: 5px; padding-right: 5px; }
+  .header-left .menu-icon{ display: flex; }
+  .header{ width: 100%; }
+  .left-side-bar{ left: calc(-1 * var(--sidebar-w)); }
+  .left-side-bar .close-sidebar{ display: block; }
+  .left-side-bar:before{ display: block; opacity: 0; visibility: hidden; }
+  .left-side-bar.open:before{ opacity: 1; visibility: visible; display: none; }
+  .left-side-bar .brand-logo a{ text-align: left; padding: 5px 15px; }
+  .left-side-bar .brand-logo a img,
+  .left-side-bar .brand-logo a .svg{ margin: 0; }
+  .header-right .brand-logo{ display: table; }
+  .header-right .menu-icon{ display: block; padding-left: 15px; padding-top: 7px; }
+  .footer-wrap{ width: 100%; }
+  .mobile-menu-overlay{ display: block; opacity: 0; visibility: hidden; }
+  .mobile-menu-overlay.show{ opacity: 0.6; visibility: visible; }
+}
+
+/* >= 1025 (buscador del header visible) */
+@media (min-width: 1025px){
+  .header-left .header-search{ display: block !important; }
+}
+
+/* <= 1024 (header relativo y layout compacto) */
+@media (max-width: 1024px){
+  .header{ position: relative; }
+  .header-left{ width: 25%; }
+  .header-right{ width: 75%; }
+  .main-container{ padding-top: 10px; }
+  .header-left .search-toggle-icon{ display: flex; }
+  .header-left .header-search{
+    padding: 15px 20px; position: absolute; left: 0; top: 100%;
+    background: #ffffff; display: none;
+  }
+  .register-page-wrap .wizard-content .wizard{ padding-left: 300px; }
+  .register-page-wrap .wizard-content .wizard .steps{ width: 300px; }
+}
+
+/* <= 991 */
+@media (max-width: 991px){
+  .device-usage-chart .width-50-p{ width: 100%; }
+}
+
+/* <= 767 (mobile) */
+@media (max-width: 767px){
+  .header{
+    position: fixed; left: 0; top: 0;
+    -webkit-box-shadow: 0px 5px 25px rgba(0,0,0,.1);
+       -moz-box-shadow: 0px 5px 25px rgba(0,0,0,.1);
+            box-shadow: 0px 5px 25px rgba(0,0,0,.1);
+  }
+  .main-container{ padding-top: calc(var(--header-h) + 24px); padding-bottom: 0; }
+  .login-box{ padding: 40px 15px; }
+  .login-header .brand-logo a img{ max-width: 150px; }
+  .pre-loader{ background-size: 43%; }
+  .xs-pd-20-10{ padding: 20px 10px; }
+  .xs-mb-20{ margin-bottom: 20px; }
+  h1, .h1 { font-size: 2rem; }
+  h2, .h2 { font-size: 1.6rem; }
+  h4, .h4 { font-size: 1.4rem; }
+  .footer-wrap{ position: relative; height: auto; }
+  .user-notification{ margin-right: 5px; }
+  .user-notification .dropdown-menu{ width: 100%; min-width: 300px; }
+  .user-info-dropdown .dropdown-toggle .user-name{ display: none; }
+  .page-header{ margin-bottom: 30px; }
+  .forgot-password{ text-align: center; }
+  .ionicons-list li{ width: 16.60%; }
+  .timeline .timeline-date{ position: relative; top: 0; margin-bottom: 20px; left: 35px; }
+  .timeline ul:before{ left: 10px; }
+  .timeline ul li{ padding-left: 0; padding-bottom: 0; }
+  .timeline ul li:before{ left: 2px; top: 28px; }
+  .fc-toolbar .fc-left{ float: none !important; padding-bottom: 10px; }
+  .fc-toolbar .fc-left:after, .fc-toolbar .fc-right:after{ content: ""; clear: both; display: table; }
+  .fc-toolbar .fc-right{ float: none !important; padding-bottom: 10px; }
+  .faq-wrap .card-header .btn{ font-size: 17px; }
+  .error-page h1{ font-size: 150px; }
+}
+
+/* <= 660 */
+@media (max-width: 660px){
+  .docs-buttons .btn-group-crop{ display: block; }
+  .select-role .btn-group .btn{ padding-left: 35px; font-size: 14px; }
+  .select-role .btn-group .btn .icon{ left: 5px; width: 25px; height: 25px; }
+  .select-role .btn-group .btn .icon .svg{ width: 25px; height: 25px; }
+  .forgot-password a{ font-size: 14px; font-weight: 600; }
+  .btn-group-lg>.btn, .btn-lg{ font-size: 16px; }
+  .register-page-wrap .wizard-content .wizard{ padding-left: 0; }
+  .register-page-wrap .wizard-content .wizard .steps{ display: none; }
+}
