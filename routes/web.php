@@ -6,6 +6,7 @@ use App\Http\Controllers\TipoInversionController;
 use App\Http\Controllers\Inversionista\ReporteController;
 use App\Http\Controllers\Moderador\UsuarioController;
 use App\Http\Controllers\Moderador\InversionController;
+use App\Http\Controllers\Moderador\HomeController;
 
 // VISTAS (Blade)
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');   
@@ -69,6 +70,8 @@ Route::middleware('auth')
       Route::post('inversiones/registrar', [InversionDocumentoController::class, 'store'])->name('inversiones.docs.store');
      // Listado de inversiones con certificado (inversion2)
       Route::get('inversiones/docs', [InversionDocumentoController::class, 'index'])->name('inversiones.docs.index');
+    // ruta home controlador 
+    Route::get('/', [HomeController::class, 'index'])->name('inicio');
   });
 
 
