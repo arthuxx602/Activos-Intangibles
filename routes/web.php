@@ -9,8 +9,16 @@ use App\Http\Controllers\Moderador\InversionController;
 use App\Http\Controllers\Moderador\HomeController;
 use App\Http\Controllers\Moderador\EstadisticasController;
 use App\Http\Controllers\Moderador\ConsultasController;
+use App\Http\Controllers\Proyecto\ProjectSelectionController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\NotasController;
+use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\Landing\ProjectSelection1Controller;
+use App\Http\Controllers\Landing\ProjectSelection2Controller;
+
+
 // VISTAS (Blade)
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');   
 Route::view('/inicio', 'dashboard.index')->name('inicio');
@@ -100,9 +108,51 @@ Route::get('/inversionista/inicio', fn()=>view('inversionista.inicio'))->name('i
 
 // Elección de proyecto (si se sigue con el proyecto 
 Route::get('/proyecto/seleccionar', fn()=>view('proyecto.eleccion'))->name('proyecto.elegir');
+// Landing (ya lo tienes)
+Route::view('/', 'landing.index')->name('landing');
+
+// Autenticación
+Route::post('/login',  [AuthController::class, 'login'])->name('login');   // si ya lo tienes, deja el tuyo
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Elección de proyecto (reemplaza eleccionproyecto.php + guardar_proyecto_seleccionado.php)
+Route::middleware('auth')->group(function () {
+    Route::get('/proyectos/elegir', [ProjectSelectionController::class, 'create'])->name('proyectos.elegir');
+    Route::post('/proyectos/seleccionar', [ProjectSelectionController::class, 'store'])->name('proyectos.seleccionar');
+});
+
+// Mantenimiento (opción visual simple)
+Route::get('/mantenimiento', [MaintenanceController::class, 'show'])->name('mantenimiento');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/notas',  [NotasController::class, 'create'])->name('notas.create');   // muestra el select
+    Route::post('/notas', [NotasController::class, 'store'])->name('notas.store');     // guarda y redirige
+});
 
 
   });
+  // Logout moderno (CSRF protegido)
+Route::post('/logout', LogoutController::class)->name('logout');
+
+// Alias opcional para mantener compatibilidad con enlaces antiguos tipo "cerrar-sesion.php"
+Route::get('/cerrar-sesion', [LogoutController::class, 'legacy'])->name('logout.legacy');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/proyectos/seleccionar', [ProjectSelectionController::class, 'index'])
+        ->name('proyectos.seleccionar');
+
+    Route::post('/proyectos/seleccionar', [ProjectSelectionController::class, 'store'])
+        ->name('proyectos.seleccionar.store');
+});
+Route::middleware('auth')->group(function () {
+    // Ruta “nueva”
+    Route::post('/proyectos/seleccionar', [ProjectSelectionController::class, 'store'])
+        ->name('proyectos.seleccionar.store');
+
+    // Alias legacy para compatibilidad con guardar_proyecto_seleccionado.php
+    Route::post('/guardar_proyecto_seleccionado', [ProjectSelectionController::class, 'store'])
+        ->name('legacy.guardar-proyecto');
+});
 
 
 // Home por defecto

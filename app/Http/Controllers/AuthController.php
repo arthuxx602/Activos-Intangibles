@@ -73,9 +73,11 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('landing');
+
+        return redirect()->route('landing')->with('status','Sesión cerrada.');
     }
 
     private function redirigirPorRol(int $rol)
@@ -87,4 +89,5 @@ class AuthController extends Controller
             default => redirect()->route('landing'),
         };
     }
+    
 }
