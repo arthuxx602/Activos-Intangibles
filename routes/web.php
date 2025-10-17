@@ -9,7 +9,8 @@ use App\Http\Controllers\Moderador\InversionController;
 use App\Http\Controllers\Moderador\HomeController;
 use App\Http\Controllers\Moderador\EstadisticasController;
 use App\Http\Controllers\Moderador\ConsultasController;
-
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Auth\AuthController;
 // VISTAS (Blade)
 Route::view('/dashboard', 'dashboard.index')->name('dashboard');   
 Route::view('/inicio', 'dashboard.index')->name('inicio');
@@ -84,6 +85,22 @@ Route::middleware('auth')
     // AJAX: proyectos por usuario (devuelve <option>…)
       Route::get('consultas/proyectos', [ConsultasController::class, 'proyectosPorUsuario'])
            ->name('consultas.proyectos-usuario'); // ?usuario_id=123
+
+  
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+
+// Login / Logout
+Route::post('/login',  [AuthController::class, 'login'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// (Estas rutas deben existir en la app; ajústarlas si usan otros nombres)
+Route::get('/admin/inicio',       fn()=>view('admin.inicio'))->name('admin.inicio');
+Route::get('/moderador/inicio',   fn()=>view('moderador.inicio'))->name('moderador.inicio');
+Route::get('/inversionista/inicio', fn()=>view('inversionista.inicio'))->name('inversionista.inicio');
+
+// Elección de proyecto (si se sigue con el proyecto 
+Route::get('/proyecto/seleccionar', fn()=>view('proyecto.eleccion'))->name('proyecto.elegir');
+
 
   });
 
