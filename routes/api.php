@@ -24,13 +24,21 @@ use App\Http\Controllers\Admin\{
 
 //esta en el modulo inversionista 
 use App\Http\Controllers\inversionista;
-use App\Http\Controllers\InversionistaController;
+//use App\Http\Controllers\InversionistaController;
 use App\Http\Controllers\Inversionista\ReporteInversionesController;
 use App\Http\Controllers\Inversionista\ReporteController;
 use App\Http\Controllers\Inversionista\DashboardController as InvDash;
 use App\Http\Controllers\Inversionista\LiquidacionController as InvLiquidacion;
+// Antes
+// use App\Http\Controllers\InversionistaController;
+
+// Después
+use App\Http\Controllers\Inversionista\InversionistaController;
+
+
 
 {
+   //moderador 
    
 
 // Catálogos
@@ -38,6 +46,8 @@ Route::get('/inversionista/catalogos', [InversionistaController::class, 'catalog
 
 // Resumen + detalle
 Route::get('/inversionista/resumen',   [InversionistaController::class, 'resumen']);
+//
+Route::get('/inversionista', [InvDash::class, 'index'])->name('inversionista.inicio'); // o .index si prefieres
 
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/inversionista/inversiones-anuales', [ReporteInversionesController::class, 'inversionesAnuales']);
@@ -69,7 +79,7 @@ Route::apiResource('proyectos',       ProyectoController::class);
 Route::apiResource('inversiones',     InversionController::class);
 Route::apiResource('empresas',        EmpresaController::class);
 Route::apiResource('paises',          PaisController::class);
-//Route::apiResource('departamentos',   DepartamentoController::class);// aun persiste el error de departamento 
+Route::apiResource('departamentos',   DepartamentoController::class);// aun persiste el error de departamento 
 Route::apiResource('municipios',      MunicipioController::class);
 Route::apiResource('tipos-inversion', TipoInversionController::class);
 Route::apiResource('tasas',           TasaController::class);
