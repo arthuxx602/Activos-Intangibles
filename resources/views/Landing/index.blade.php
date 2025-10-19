@@ -28,6 +28,27 @@
   {{-- Tus estilos propios que estaban en src/styles --}}
   <link rel="stylesheet" href="{{ asset('legacy/src/styles/style.css') }}">
   <link rel="stylesheet" href="{{ asset('legacy/src/styles/style-inicio.css') }}">
+
+  {{-- Estilo del HERO con fondo usando hero-img.png --}}
+  <style>
+    #hero{
+      background: url('{{ asset('assets/img/hero-img.png') }}') right center no-repeat;
+      background-size: cover;
+      padding: 80px 0;
+    }
+    #hero .btn-get-started{
+      display:inline-block;
+      padding: 12px 24px;
+      border-radius: 4px;
+      background:#0d6efd;
+      color:#fff;
+      font-weight:600;
+      text-decoration:none;
+    }
+    @media (max-width: 991.98px) {
+      #hero{ background-position: center; }
+    }
+  </style>
 </head>
 
 <body>
@@ -126,19 +147,19 @@
     </div>
   </header>
 
-  {{-- Hero --}}
-  <section id="hero">
+  {{-- Hero con fondo + ilustración --}}
+  <section id="hero" class="d-flex align-items-center">
     <div class="container">
       <div class="row">
         <div class="col-lg-6 pt-5 pt-lg-0 order-2 order-lg-1 d-flex flex-column justify-content-center" data-aos="fade-up">
           <div>
             <h1>Bienvenido a la Plataforma de distribución de participación</h1>
-            <h2>Distribuye tu capital de manera eficiente, con el software de justicia accionaria actualizado</h2>
-            <a href="#about" class="btn-get-started scrollto">Enséñame más</a>
+            <h2>Distribuye tu capital de manera eficiente, con el software de justicia accionaria actualizado del momento</h2>
+            <a href="#about" class="btn-get-started scrollto">ENSÉÑAME MÁS</a>
           </div>
         </div>
-        <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="fade-left">
-          <img src="{{ asset('assets/img/hero-img.png') }}" class="img-fluid" alt="">
+        <div class="col-lg-6 order-1 order-lg-2 hero-img d-flex justify-content-center" data-aos="zoom-in">
+          <img src="{{ asset('assets/img/hero-img.png') }}" class="img-fluid" alt="Ilustración analítica" style="max-height:520px">
         </div>
       </div>
     </div>
@@ -222,6 +243,59 @@
     </div>
   </section>
 
+  {{-- ======= Services ======= --}}
+  <section id="services" class="services section-bg">
+    <div class="container">
+      <div class="section-title" data-aos="fade-up">
+        <h2>Servicios</h2>
+        <p>Presentamos más funcionalidades del proyecto.</p>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in">
+          <div class="icon-box icon-box-pink">
+            <div class="icon"><i class="bx bxl-dribbble"></i></div>
+            <h4 class="title"><a href="#">Roles</a></h4>
+            <p class="description">
+              No se preocupe por el ingreso en apartados de administración,
+              cada persona contará con su propia visualización y control de información.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="100">
+          <div class="icon-box icon-box-cyan">
+            <div class="icon"><i class="bx bx-file"></i></div>
+            <h4 class="title"><a href="#">Documentación</a></h4>
+            <p class="description">
+              Descargue y cargue los certificados y documentos legales de sus inversiones.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="200">
+          <div class="icon-box icon-box-green">
+            <div class="icon"><i class="bx bx-tachometer"></i></div>
+            <h4 class="title"><a href="#">Rendimiento</a></h4>
+            <p class="description">
+              Visualice y logre procesar la información en tiempo real y sin contratiempos.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3 d-flex align-items-stretch mb-5 mb-lg-0" data-aos="zoom-in" data-aos-delay="300">
+          <div class="icon-box icon-box-blue">
+            <div class="icon"><i class="bx bx-world"></i></div>
+            <h4 class="title"><a href="#">Globalización</a></h4>
+            <p class="description">
+              Realice su distribución desde cualquier parte del mundo.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   {{-- ======= Team ======= --}}
   <section id="team" class="team">
     <div class="container">
@@ -231,7 +305,6 @@
       </div>
 
       @php
-        // Coloca aquí los nombres EXACTOS de los archivos en /public/assets/img/team/
         $team = [
           ['img' => 'team/Cristhian Raul.jpg',                     'name' => 'Cristhian Raul Mora Angulo',           'role' => 'Desarrollador'],
           ['img' => 'team/Diana Karina Lopez Carreño.jpg',         'name' => 'Diana Karina López Carreño',           'role' => 'Docente'],
@@ -239,6 +312,8 @@
           ['img' => 'team/Jonatan Riveros.jpg',                    'name' => 'Jonatan Mateo Riveros Méndez',         'role' => 'Desarrollador'],
           ['img' => 'team/Kevin Alexander Pena Conejo.jpg',        'name' => 'Kevin Alexander Peña Conejo',          'role' => 'CTO'],
           ['img' => 'team/Paula Cantor Caballero.jpg',             'name' => 'Paula Andrea Cantor Caballero',        'role' => ''],
+          ['img' => 'team/team-1.jpg',                             'name' => 'Micher Alexander Gonzales Monroy',     'role' => 'Docente'],
+          ['img' => 'team/team-1.jpg',                             'name' => 'Campo Eli Castillo Eraso',             'role' => 'Docente'],
         ];
       @endphp
 
@@ -284,7 +359,6 @@
             <p>Rendimiento esperado de una inversión considerada sin riesgo.</p>
           </div>
         </li>
-        {{-- ...más preguntas --}}
       </ul>
     </div>
   </section>
