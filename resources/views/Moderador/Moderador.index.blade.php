@@ -65,7 +65,7 @@
   </div>
 
   <div class="bg-white pd-20 card-box mb-30">
-   <h5 class="h4 text-blue mb-20">Inversiones realizadas expresadas en millones</h5>
+    <h5 class="h4 text-blue mb-20">Inversiones realizadas expresadas en millones</h5>
     <div id="TimeLine"></div>
   </div>
 
@@ -73,7 +73,7 @@
     <div class="col-lg-6 col-md-12 col-sm-12 mb-30">
       <div class="pd-20 card-box" style="height: 360px;">
         <h5 class="h4 text-blue mb-20">% Aportes</h5>
-        <div class="pd-20 card-box height-100-p" style="height: 255px">
+        <div class="pd-20 card-box height-100-p" style="height: 255px;">
           <div id="chart8Valor" style="max-width: 500px;"></div>
         </div>
       </div>
@@ -82,7 +82,7 @@
     <div class="col-lg-6 col-md-12 col-sm-12 mb-30">
       <div class="pd-20 card-box" style="height: 360px; overflow: hidden;">
         <h5 class="h4 text-blue mb-20">Usuarios</h5>
-        <div class="pd-20 card-box height-100-p" style="height: 255px">
+        <div class="pd-20 card-box height-100-p" style="height: 255px;">
           <div id="velocimetro"></div>
         </div>
       </div>
@@ -91,7 +91,7 @@
     <div class="col-lg-6 col-md-12 col-sm-12 mb-30">
       <div class="pd-20 card-box" style="height: 360px; overflow: hidden;">
         <h5 class="h4 text-blue mb-20">Gráfica de radar % tipos de inversiones</h5>
-        <div class="pd-20 card-box height-100-p" style="height: 255px, overflow: hidden">
+        <div class="pd-20 card-box height-100-p" style="height: 255px; overflow: hidden;">
           <div id="chart8Tipos"></div>
         </div>
       </div>
@@ -100,7 +100,7 @@
     <div class="col-lg-6 col-md-12 col-sm-12 mb-30">
       <div class="pd-20 card-box" style="height: 360px;">
         <h5 class="h4 text-blue mb-20">Participación máxima vs mínima</h5>
-        <div class="pd-20 card-box height-100-p" style="height: 255px">
+        <div class="pd-20 card-box height-100-p" style="height: 255px;">
           <div id="chart9" style="max-width: 500px;"></div>
         </div>
       </div>
@@ -199,40 +199,41 @@
 
 </div>
 
-{{-- ===== Pasar datos al front (como hacías con localStorage y JS) ===== --}}
-<script>
-  // KPIs a localStorage (si tus scripts los leen así)
-  localStorage.setItem('cantidadUsuarios', {{ (int)$cantidadUsuarios }});
-  localStorage.setItem('inversionTipo1', {{ (float)$montoTipo1 }});
-  localStorage.setItem('inversionTipo2', {{ (float)$montoTipo2 }});
-  localStorage.setItem('inversionTipo3', {{ (float)$montoTipo3 }});
-  // Datos mensuales para gráficas
-  window.datosMensuales = @json($datosMensuales);
-  // (Opcional) tasa usada en VF:
-  window.tasaAjustada = {{ (float)$tasaAjustada }};
-</script>
-
-{{-- ===== Librerías que usabas (puedes servirlas por Vite o CDN) ===== --}}
-{{-- Ejemplos de CDN (ajusta rutas si ya los empacas con Vite) --}}
-<script src="{{ asset('src/plugins/apexcharts/apexcharts.min.js') }}"></script>
-<script src="{{ asset('vendors/scripts/apexcharts-setting-simulacion.js') }}"></script>
-
-<script src="{{ asset('src/plugins/highcharts-6.0.7/code/highcharts.js') }}"></script>
-<script src="https://code.highcharts.com/highcharts-3d.js"></script>
-<script src="https://code.highcharts.com/10/highcharts.js"></script>
-<script src="{{ asset('vendors/scripts/highchart-setting-simulacion.js') }}"></script>
-
-{{-- DataTables (si lo necesitas aquí) --}}
-<script src="{{ asset('src/plugins/datatables/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/dataTables.responsive.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/dataTables.buttons.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/buttons.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/buttons.print.min.js') }}"></script }}
-<script src="{{ asset('src/plugins/datatables/js/buttons.html5.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/buttons.flash.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/pdfmake.min.js') }}"></script>
-<script src="{{ asset('src/plugins/datatables/js/vfs_fonts.js') }}"></script>
-<script src="{{ asset('vendors/scripts/datatable-setting.js') }}"></script>
+{{-- Bootstrap de datos para JS externo (sin scripts inline) --}}
+<div id="js-bootstrap"
+     data-cantidad-usuarios="{{ (int) $cantidadUsuarios }}"
+     data-monto1="{{ (float) $montoTipo1 }}"
+     data-monto2="{{ (float) $montoTipo2 }}"
+     data-monto3="{{ (float) $montoTipo3 }}"
+     data-datos-mensuales='@json($datosMensuales)'
+     data-tasa-ajustada="{{ (float) $tasaAjustada }}"
+     class="d-none">
+</div>
 @endsection
+
+
+@push('scripts')
+  {{-- Librerías necesarias --}}
+  <script src="{{ asset('src/plugins/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ asset('vendors/scripts/apexcharts-setting-simulacion.js') }}"></script>
+
+  <script src="{{ asset('src/plugins/highcharts-6.0.7/code/highcharts.js') }}"></script>
+  <script src="https://code.highcharts.com/highcharts-3d.js"></script>
+
+  {{-- DataTables (si lo usas aquí) --}}
+  <script src="{{ asset('src/plugins/datatables/js/jquery.dataTables.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/dataTables.bootstrap4.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/dataTables.responsive.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/responsive.bootstrap4.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/dataTables.buttons.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/buttons.bootstrap4.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/buttons.print.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/buttons.html5.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/buttons.flash.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/pdfmake.min.js') }}"></script>
+  <script src="{{ asset('src/plugins/datatables/js/vfs_fonts.js') }}"></script>
+  <script src="{{ asset('vendors/scripts/datatable-setting.js') }}"></script>
+
+  {{-- Tu bootstrap JS externo (debajo de todo) --}}
+  <script src="{{ asset('js/moderador_boot.js') }}"></script>
+@endpush

@@ -4,13 +4,15 @@
   <meta charset="utf-8">
   <title>@yield('title', 'Panel Moderador')</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  @vite(['resources/css/app.css','resources/js/app.js'])
-  @vite(['resources/css/app.css', 'resources/css/style.css'])
-  @vite(['resources/css/app.css', 'resources/moderador/app.css'])
-  @vite(['resources/css/app.css', 'resources/moderador/media.css'])
 
-
-
+  {{-- Un solo @vite con todos tus assets --}}
+  @vite([
+    'resources/css/app.css',
+    'resources/css/style.css',
+    'resources/moderador/app.css',
+    'resources/moderador/media.css',
+    'resources/js/app.js'
+  ])
 
   <style>
     .user-icon{
@@ -48,12 +50,14 @@
     .dropdown-menu{min-width:220px}
   </style>
 </head>
+
 @php
   // Traemos nombre/apellido desde sesión (migración gradual)
   $nombre   = session('nombre', '');
   $apellido = session('apellido', '');
   $letra    = mb_strtoupper(mb_substr($nombre, 0, 1));
 @endphp
+
 <body>
 
   {{-- Header --}}
@@ -155,7 +159,7 @@
   {{-- Sidebar izquierda --}}
   <div class="left-side-bar" id="left-sidebar">
     <div class="brand-logo">
-      <a href="{{ route('moderador.inicio', absolute:false) }}">
+      <a href="{{ route('moderador.inicio') }}">
         {{-- Pon tu logo si aplica --}}
         <img src="" alt="" class="dark-logo">
       </a>
@@ -166,7 +170,7 @@
       <div class="sidebar-menu">
         <ul id="accordion-menu">
           <li>
-            <a href="{{ route('moderador.inicio', absolute:false) }}"
+            <a href="{{ route('moderador.inicio') }}"
                class="{{ request()->routeIs('moderador.inicio') ? 'active' : '' }}">
               <span class="micon fa fa-home"></span><span class="mtext">Inicio</span>
             </a>
@@ -194,7 +198,7 @@
 
           <li>
             @php
-              // si luego creas el módulo de consultas, define la ruta y cámbialo aquí
+              // cuando exista el módulo de consultas, cambia la ruta aquí
               $consultasRoute = route('moderador.inversiones.index'); // placeholder
             @endphp
             <a href="{{ $consultasRoute }}" class="dropdown-toggle no-arrow">
@@ -250,7 +254,8 @@
     document.querySelector('.sidebar-dark')?.addEventListener('click', ()=>leftSidebar.style.background='#0f172a');
     document.querySelector('.sidebar-light')?.addEventListener('click', ()=>leftSidebar.style.background='#fff');
   </script>
+
+  <!-- Aquí se inyectan los <script> de cada vista -->
+  @stack('scripts')
 </body>
 </html>
-@import './style.css';
-@import './media.css';

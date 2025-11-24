@@ -76,9 +76,9 @@ class ProjectSelectionController extends Controller
         // Redirección según rol (ajusta a tus rutas reales)
         switch ($rol) {
             case 2: // Moderador
-                return redirect()->route('moderador.dashboard');
+                return redirect()->route('moderador.Dashboard');
             case 3: // Inversionista
-                return redirect()->route('inversionista.dashboard');
+                return redirect()->route('inversionista.DashBoard_I');
             default:
                 return redirect()->route('landing'); // o '/'
         }

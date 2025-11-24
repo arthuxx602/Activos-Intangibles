@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Proyecto;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Models\Proyecto;
 
 class ProjectSelectionController extends Controller
 {
     public function create(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         // Relación belongsToMany en Usuario (ver modelos más abajo)

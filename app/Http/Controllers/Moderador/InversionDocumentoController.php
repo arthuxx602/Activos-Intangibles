@@ -97,8 +97,8 @@ class InversionDocumentoController extends Controller
         $filename = uniqid('cert_').'.'.$pdf->getClientOriginalExtension();
         $pdf->storeAs('public/certificados', $filename);
 
-        // Insertar registro en inversion2 (mantenemos "Monto_Ajustado" como vacío, como en tu PHP)
-        Inversion2::create([
+        // Insertar registro en la tabla inversion2 usando el query builder (evita dependencia a App\Models\Inversion2)
+        DB::table('inversion2')->insert([
             'Nombre'               => $data['usuario'],
             'Monto'                => $data['monto'],
             'Monto_Ajustado'       => '', // igual que tu $montoA en legacy
@@ -121,7 +121,8 @@ class InversionDocumentoController extends Controller
     [$proyectoId, $proyectoNombre] = $this->resolveProyectoIdYNombre($request);
 
     // Si quieres filtrar por proyecto activo, y en tu tabla guardas el NOMBRE del proyecto:
-    $query = \App\Models\Inversion2::query();
+    // Usar query builder contra la tabla inversion2 para evitar dependencia del modelo inexistente
+    $query = DB::table('inversion2');
     if ($proyectoNombre) {
         $query->where('proyecto', $proyectoNombre);
     }

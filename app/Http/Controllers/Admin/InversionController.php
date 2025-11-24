@@ -3,20 +3,29 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Inversion;
+use App\Models\Admin\Inversion; 
+use App\Models\moderador\Inversion2;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class InversionController extends Controller
 {
     /**
-     * GET /api/inversiones
-     * Filtros: ?usuario=ID & proyecto=ID & tipo=ID & from=YYYY-MM-DD & to=YYYY-MM-DD & search=...
+     * WEB: Devuelve la vista Blade de inversiones
+     */
+    public function indexView()
+    {
+        return view('inversiones.index'); // Asegúrate de que exista resources/views/inversiones/index.blade.php
+    }
+
+    /**
+     * API: Devuelve JSON de inversiones con filtros
      */
     public function index(Request $r)
     {
-        $q = Inversion::query()
+        $q = Inversion2::query()
             ->with([
                 'usuario:ID_Usuario,Nombre,Apellido',
                 'proyecto:ID_Proyecto,Nombre',
@@ -32,7 +41,7 @@ class InversionController extends Controller
             $s = $r->input('search');
             $q->where(function ($q) use ($s) {
                 $q->where('Nombre', 'like', "%$s%")
-                  ->orWhere('Descripcion', 'like', "%$s%");
+                    ->orWhere('Descripcion', 'like', "%$s%");
             });
         }
 
@@ -40,12 +49,7 @@ class InversionController extends Controller
     }
 
     /**
-     * POST /api/inversiones
-     * Acepta archivo opcional 'CertificadoInversion'
-     */
-    public function store(Request $r)
-    {
-        $data = $r->validate([
+     * Crear inversión (API)
             'Nombre'          => 'required|string|max:200',
             'Monto'           => 'required|numeric|min:0',
             'Fecha'           => 'required|date',
@@ -67,22 +71,47 @@ class InversionController extends Controller
 
         return response()->json([
             'message' => 'Inversión creada correctamente.',
-            'data'    => $inv->load(['usuario','proyecto','tipo']),
+            'data'    => $inv->load(['usuario', 'proyecto', 'tipo']),
         ], 201);
     }
 
     /**
-     * GET /api/inversiones/{inversion}
+     * Mostrar inversión específica (API)
      */
-    public function show(Inversion $inversion)
+    // En este caso para saber donde va la realcion en si y saber que modelos estan tronando 
+    public function show(Inversion2 $inversion, string $idExtra = null)
+{
+    // relaciones que nos gustaría tener
+    $posibles = ['usuario', 'proyecto', 'tipo'];
+
+    // nos quedamos SOLO con las que realmente existen como método relación
+    $rels = collect($posibles)
+        ->filter(function ($rel) use ($inversion) {
+            // ¿el método existe en el modelo?
+            if (!method_exists($inversion, $rel)) {
+                return false;
+            }
+            // ¿ese método devuelve una relación Eloquent?
+            return $inversion->{$rel}() instanceof Relation;
+        })
+        ->all();
+
+    // cargamos solo las relaciones válidas
+    $inversion->load($rels);
+
+    // retornamos la inversión lista (esto puede ser JSON si esta ruta es API)
+    return $inversion;
+}
+    
+    /*public function show(Inversion2 $inversion)
     {
-        return $inversion->load(['usuario','proyecto','tipo']);
-    }
+        return $inversion->load(['usuario', 'proyecto', 'tipo']);
+    }*/
 
     /**
-     * PUT /api/inversiones/{inversion}
+     * Actualizar inversión (API)
      */
-    public function update(Request $r, Inversion $inversion)
+    public function update(Request $r, Inversion2 $inversion)
     {
         $data = $r->validate([
             'Nombre'          => 'sometimes|required|string|max:200',
@@ -110,14 +139,14 @@ class InversionController extends Controller
 
         return response()->json([
             'message' => 'Inversión actualizada.',
-            'data'    => $inversion->fresh()->load(['usuario','proyecto','tipo']),
+            'data'    => $inversion->fresh()->load(['usuario', 'proyecto', 'tipo']),
         ]);
     }
 
     /**
-     * DELETE /api/inversiones/{inversion}
+     * Eliminar inversión (API)
      */
-    public function destroy(Inversion $inversion)
+    public function destroy(Inversion2 $inversion)
     {
         $id = $inversion->ID_Inversion;
         $inversion->delete();
@@ -126,8 +155,7 @@ class InversionController extends Controller
     }
 
     /**
-     * DELETE /api/inversiones (lote)
-     * Body: { "ids": [ ... ] }
+     * Eliminar inversiones en lote (API)
      */
     public function destroyMany(Request $r)
     {
@@ -145,20 +173,22 @@ class InversionController extends Controller
     }
 
     /**
-     * Guarda CertificadoInversion en storage/app/certificados/inversiones
+     * Guardar archivo CertificadoInversion
      */
     private function storeCert(\Illuminate\Http\UploadedFile $file, int $usuarioId, int $proyectoId): string
     {
         $dir = storage_path('app/certificados/inversiones');
-        if (!is_dir($dir)) { @mkdir($dir, 0775, true); }
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }   
 
-        $base = 'inv-u'.$usuarioId.'-p'.$proyectoId.'-'.Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $base = 'inv-u' . $usuarioId . '-p' . $proyectoId . '-' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
         $ext  = strtolower($file->getClientOriginalExtension());
-        $name = $base.'.'.$ext;
+        $name = $base . '.' . $ext;
 
         $i = 1;
-        while (file_exists($dir.DIRECTORY_SEPARATOR.$name)) {
-            $name = $base.'-'.$i.'.'.$ext;
+        while (file_exists($dir . DIRECTORY_SEPARATOR . $name)) {
+            $name = $base . '-' . $i . '.' . $ext;
             $i++;
         }
 

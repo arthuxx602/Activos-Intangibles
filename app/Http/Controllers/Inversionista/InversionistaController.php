@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inversion;
 use App\Models\Proyecto;
-use App\Models\Tasa;
+use App\Models\Inversionista\Tasa;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;

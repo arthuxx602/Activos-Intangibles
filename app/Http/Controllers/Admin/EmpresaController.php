@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Empresa;
+use App\Models\Admin\Empresa;
+//use App\Models\Empresa;
 use Illuminate\Http\Request;
 
 class EmpresaController extends Controller

@@ -10,7 +10,7 @@ use App\Models\Inversion;
 use App\Models\Usuario;
 use App\Models\Proyecto;
 
-class InversionController extends Controller
+class InversionistaController extends Controller
 {
     public function __construct()
     {

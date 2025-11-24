@@ -8,29 +8,16 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\LogoutController;
 
 use App\Http\Controllers\Proyecto\ProjectSelectionController;
-
-use App\Http\Controllers\TipoInversionController;
-
+use App\Http\Controllers\Admin\TipoInversionController;
 use App\Http\Controllers\Moderador\HomeController as ModHome;
 use App\Http\Controllers\Moderador\UsuarioController as ModUsuarios;
-use App\Http\Controllers\Moderador\InversionController as ModInversiones;
-use App\Http\Controllers\Moderador\EstadisticasController as ModStats;
-use App\Http\Controllers\Moderador\ConsultasController as ModConsultas;
-// use App\Http\Controllers\Moderador\InversionDocumentoController as ModInvDocs; // si existe
-
+use App\Http\Controllers\Moderador\InversionistaController as ModInversiones;
 use App\Http\Controllers\Inversionista\DashboardController as InvDash;
 use App\Http\Controllers\Inversionista\ResumenController as InvResumen;
 use App\Http\Controllers\Inversionista\ReporteController as InvReporte;
 use App\Http\Controllers\Inversionista\LiquidacionController as InvLiquidacion;
-use App\Http\Controllers\Inversionista\InversionistaController;
+// … (el resto de use que ya tienes)
 
-
-use App\Http\Controllers\MaintenanceController;
-use App\Http\Controllers\NotasController;
-
-// ===================================================================
-// Todo bajo el middleware de "web" (cookies, sesión, CSRF, etc.)
-// ===================================================================
 Route::middleware('web')->group(function () {
 
     // =======================
@@ -38,30 +25,36 @@ Route::middleware('web')->group(function () {
     // =======================
     Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-    Route::post('/login',  [AuthController::class, 'login'])->name('login');
+    // login/logout SIN middleware de autenticación
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-    // Logout (POST). Alias legacy GET opcional para compatibilidad
-    Route::post('/logout', LogoutController::class)->name('logout');
-    Route::get('/cerrar-sesion', [LogoutController::class, 'legacy'])->name('logout.legacy');
-
+    Route::post('/logout', function () {
+        session()->invalidate();
+        session()->regenerateToken();
+        return redirect()->route('landing');
+    })->name('logout');
 
     // =======================
-    //   REQUIEREN SESIÓN
+    //   RUTAS CON SESIÓN
     // =======================
     Route::middleware('legacy.auth')->group(function () {
 
-        // --------- Selección de proyecto (reemplaza eleccionproyecto.php + guardar_proyecto_seleccionado.php)
+        // Rutas de aterrizaje por rol
+        Route::get('/admin', fn () => 'Admin')->name('admin.inicio');
+        Route::get('/moderador', fn () => 'Moderador')->name('moderador.inicio');
+        Route::get('/inversionista', fn () => 'Inversionista')->name('inversionista.inicio');
+
+        // Selección de proyecto
         Route::get('/proyectos/seleccionar',  [ProjectSelectionController::class, 'index'])
             ->name('proyectos.seleccionar');
         Route::post('/proyectos/seleccionar', [ProjectSelectionController::class, 'store'])
             ->name('proyectos.seleccionar.store');
 
-        // --------- Tipos de inversión (ejemplo de recurso protegido)
+        // Tipos de inversión protegidos
         Route::resource('/tipos', TipoInversionController::class);
 
-        // Dashboard simple de aterrizaje tras login
+        // Dashboard simple
         Route::get('/dashboard', fn () => redirect()->route('tipos.index'))->name('dashboard');
-        Route::post('/login', [AuthController::class, 'login'])->name('login');
 
         // =======================
         //      MODERADOR (rol=2)
@@ -70,7 +63,6 @@ Route::middleware('web')->group(function () {
             ->prefix('moderador')
             ->name('moderador.')
             ->group(function () {
-
                 Route::get('/', [ModHome::class, 'index'])->name('inicio');
 
                 // Usuarios
@@ -79,23 +71,12 @@ Route::middleware('web')->group(function () {
                 Route::put('usuarios/{id}',   [ModUsuarios::class, 'update'])->name('usuarios.update');
                 Route::delete('usuarios/{id}',[ModUsuarios::class, 'destroy'])->name('usuarios.destroy');
 
-                // Inversiones
+                // Inversiones moderador
                 Route::get('inversiones',  [ModInversiones::class, 'index'])->name('inversiones.index');
                 Route::post('inversiones', [ModInversiones::class, 'store'])->name('inversiones.store');
-                Route::get('/inversionista', [InvDash::class, 'index'])->name('inversionista.inicio');
-                // Certificados / carga PDF (si existe el controlador)
-                // Route::get('inversiones/registrar',  [ModInvDocs::class, 'create'])->name('inversiones.docs.create');
-                // Route::post('inversiones/registrar', [ModInvDocs::class, 'store'])->name('inversiones.docs.store');
-                // Route::get('inversiones/docs',       [ModInvDocs::class, 'index'])->name('inversiones.docs.index');
 
-                // Estadísticas (reemplazo de datosLine.php)
-                Route::get('estadisticas/datos-line', [ModStats::class, 'datosLine'])->name('estadisticas.datos-line');
-
-                // Consultas
-                Route::get('consultas',  [ModConsultas::class, 'index'])->name('consultas.index');
-                Route::post('consultas', [ModConsultas::class, 'consultar'])->name('consultas.consultar');
-                Route::get('consultas/proyectos', [ModConsultas::class, 'proyectosPorUsuario'])
-                    ->name('consultas.proyectos-usuario'); // ?usuario_id=123
+                // Consultas, estadísticas, etc. (como ya lo tienes)
+                // ...
             });
 
         // =======================
@@ -111,15 +92,9 @@ Route::middleware('web')->group(function () {
                 Route::get('/reportes/line-anual', [InvReporte::class, 'lineAnual'])->name('reportes.line-anual');
             });
 
-        // =======================
-        //   Otros protegidos
-        // =======================
-        Route::get('/mantenimiento', [MaintenanceController::class, 'show'])->name('mantenimiento');
-
-        Route::get('/notas',  [NotasController::class, 'create'])->name('notas.create');
-        Route::post('/notas', [NotasController::class, 'store'])->name('notas.store');
+        // Otras rutas protegidas (mantenimiento, notas, etc.)
+        // ...
     });
-
 
     // =======================
     //      FALLBACK 404

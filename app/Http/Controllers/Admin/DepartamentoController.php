@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pais;
+use App\Models\Admin\Departamento;
 use Illuminate\Http\Request;
 
 class PaisController extends Controller

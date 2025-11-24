@@ -1,4 +1,4 @@
-{{-- resources/views/landing/index.blade.php --}}
+{{-- resources/views/landing/Sipmainputvalue.blade.php --}}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,7 +32,7 @@
   {{-- Estilo del HERO con fondo usando hero-img.png --}}
   <style>
     #hero{
-      background: url('{{ asset('assets/img/hero-img.png') }}') right center no-repeat;
+      background: url("{{ asset('assets/css/img/hero-img.png') }}") right center no-repeat;
       background-size: cover;
       padding: 80px 0;
     }
@@ -501,20 +501,27 @@
   <script src="{{ asset('legacy/src/plugins/jquery-steps/jquery.steps.js') }}"></script>
   <script src="{{ asset('legacy/vendors/scripts/steps-setting.js') }}"></script>
 
-  {{-- Inicializaciones + auto-abrir modal si hubo errores --}}
+ {{-- Inicializaciones + auto-abrir modal si hubo errores --}}
+@php
+    // Evita errores si $errors no está disponible en la vista
+    $hasErrors = isset($errors) && method_exists($errors, 'any') ? $errors->any() : false;
+    $openLoginModal = $hasErrors || session('open_login_modal', false);
+@endphp
+{{-- Inicializaciones + auto-abrir modal si hubo errores --}}
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       if (window.AOS) AOS.init();
 
-      @if ($errors->any() || session('open_login_modal'))
-      try {
-        if (window.bootstrap && typeof bootstrap.Modal === 'function') {
-          new bootstrap.Modal(document.getElementById('login-modal')).show();
-        } else if (window.$ && typeof $('#login-modal').modal === 'function') {
-          $('#login-modal').modal('show');
-        }
-      } catch (e) {}
-      @endif
+      // Auto-open login modal when server indicates it
+      if ({!! json_encode($openLoginModal) !!}) {//pendiente por arreglar en html, 
+        try {
+          if (window.bootstrap && typeof bootstrap.Modal === 'function') {
+            new bootstrap.Modal(document.getElementById('login-modal')).show();
+          } else if (window.$ && typeof $('#login-modal').modal === 'function') {
+            $('#login-modal').modal('show');
+          }
+        } catch (e) {}
+      }
     });
 
     function validarFormulario() {

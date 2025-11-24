@@ -24,13 +24,12 @@ use App\Http\Controllers\Admin\{
 
 //esta en el modulo inversionista 
 use App\Http\Controllers\inversionista;
-//use App\Http\Controllers\InversionistaController;
 use App\Http\Controllers\Inversionista\ReporteInversionesController;
 use App\Http\Controllers\Inversionista\ReporteController;
 use App\Http\Controllers\Inversionista\DashboardController as InvDash;
 use App\Http\Controllers\Inversionista\LiquidacionController as InvLiquidacion;
 // Antes
-// use App\Http\Controllers\InversionistaController;
+
 
 // Después
 use App\Http\Controllers\Inversionista\InversionistaController;
@@ -42,10 +41,10 @@ use App\Http\Controllers\Inversionista\InversionistaController;
    
 
 // Catálogos
-Route::get('/inversionista/catalogos', [InversionistaController::class, 'catalogos']);
+//Route::get('/inversionista/catalogos', [InversionistaController::class, 'catalogos']);
 
 // Resumen + detalle
-Route::get('/inversionista/resumen',   [InversionistaController::class, 'resumen']);
+//Route::get('/inversionista/resumen',   [InversionistaController::class, 'resumen']);
 //
 Route::get('/inversionista', [InvDash::class, 'index'])->name('inversionista.inicio'); // o .index si prefieres
 
@@ -58,12 +57,12 @@ Route::get('/inversionista/liquidacion/resumen', [InvLiquidacion::class, 'resume
 
 }
 
-// Import DepartamentoController from the correct namespace if not in Admin //  estan en admin 
+// Import DepartamentoController from the correct namespace if not in Admin
 use App\Http\Controllers\DepartamentoController;
 
 
 // OJO: TipoInversionController NO está en Admin // estan en admin 
-use App\Http\Controllers\TipoInversionController;
+use App\Http\Controllers\Admin\TipoInversionController;
 // =====================================================
 // RUTA DE PRUEBA
 // =====================================================
@@ -79,7 +78,7 @@ Route::apiResource('proyectos',       ProyectoController::class);
 Route::apiResource('inversiones',     InversionController::class);
 Route::apiResource('empresas',        EmpresaController::class);
 Route::apiResource('paises',          PaisController::class);
-Route::apiResource('departamentos',   DepartamentoController::class);// aun persiste el error de departamento 
+//Route::apiResource('departamentos',   DepartamentoController::class);// aun persiste el error de departamento 
 Route::apiResource('municipios',      MunicipioController::class);
 Route::apiResource('tipos-inversion', TipoInversionController::class);
 Route::apiResource('tasas',           TasaController::class);

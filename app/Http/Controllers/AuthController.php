@@ -7,6 +7,7 @@ use App\Models\Usuario;
 use App\Models\Proyecto;
 use App\Models\ProyectoUsuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -89,5 +90,6 @@ class AuthController extends Controller
             default => redirect()->route('landing'),
         };
     }
+    
     
 }
