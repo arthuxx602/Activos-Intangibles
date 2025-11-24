@@ -55,59 +55,42 @@
 
   {{-- Modal Login --}}
   <div class="modal fade" id="login-modal" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
-      <div class="modal-content">
-        <div class="login-box bg-white box-shadow border-radius-10">
-          <div class="login-title">
-            <h2 class="text-center text-primary" id="loginLabel">Iniciar Sesión</h2>
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+      <div class="modal-content border-0">
+        <div class="card border-0 shadow-lg rounded-4 mb-0">
+          <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+              <h2 class="fw-bold text-primary mb-1" id="loginLabel">Iniciar sesión</h2>
+              <p class="text-muted mb-0">Accede con tu cédula y contraseña.</p>
+            </div>
+
+            {{-- MENSAJES DE ERROR --}}
+            @if ($errors->any())
+              <div class="alert alert-danger rounded-3">
+                <ul class="mb-0">
+                  @foreach ($errors->all() as $e)
+                    <li>{{ $e }}</li>
+                  @endforeach
+                </ul>
+              </div>
+            @endif
+
+            <form method="post" action="{{ route('login') }}" onsubmit="return validarFormulario();" class="mt-3">
+              @csrf
+              <div class="mb-3">
+                <label for="cedula" class="form-label fw-semibold">Cédula</label>
+                <input type="number" class="form-control form-control-lg" placeholder="Ingresa tu cédula" id="cedula" name="cedula" value="{{ old('cedula') }}">
+              </div>
+
+              <div class="mb-4">
+                <label for="contrasena" class="form-label fw-semibold">Contraseña</label>
+                <input type="password" class="form-control form-control-lg" placeholder="Ingresa tu contraseña" id="contrasena" name="contrasena">
+              </div>
+
+              <button class="btn btn-primary btn-lg w-100 mb-2" type="submit">Iniciar sesión</button>
+              <button type="button" class="btn btn-outline-secondary w-100" data-bs-dismiss="modal" data-dismiss="modal">Cerrar</button>
+            </form>
           </div>
-
-          {{-- MENSAJES DE ERROR --}}
-          @if ($errors->any())
-            <div class="alert alert-danger mx-3">
-              <ul class="mb-0">
-                @foreach ($errors->all() as $e)
-                  <li>{{ $e }}</li>
-                @endforeach
-              </ul>
-            </div>
-          @endif
-
-          <form method="post" action="{{ route('login') }}" onsubmit="return validarFormulario();">
-            @csrf
-            <div class="input-group custom">
-              <input type="number" class="form-control form-control-lg" placeholder="Cédula" id="cedula" name="cedula" value="{{ old('cedula') }}">
-              <div class="input-group-append custom">
-                <span class="input-group-text"><i class="icon-copy dw dw-user1"></i></span>
-              </div>
-            </div>
-            <div class="input-group custom">
-              <input type="password" class="form-control form-control-lg" placeholder="Contraseña" id="contrasena" name="contrasena">
-              <div class="input-group-append custom">
-                <span class="input-group-text"><i class="dw dw-padlock1"></i></span>
-              </div>
-            </div>
-
-            <div class="row align-items-center">
-              <div class="col-5">
-                <div class="input-group mb-0">
-                  <button class="btn btn-primary btn-lg w-100" type="submit">Iniciar sesión</button>
-                </div>
-              </div>
-              <div class="col-2">
-                <div class="font-16 weight-600 text-center" data-color="#707373">Ó</div>
-              </div>
-              <div class="col-5">
-                <div class="input-group mb-0">
-                  <button type="button" class="btn btn-outline-primary btn-lg w-100"
-                          data-bs-dismiss="modal" data-dismiss="modal">
-                    Salir
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
-
         </div>
       </div>
     </div>

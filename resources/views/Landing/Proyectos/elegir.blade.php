@@ -13,7 +13,7 @@
         <div class="alert alert-success">{{ session('status') }}</div>
     @endif
 
-    <form method="POST" action="{{ route('proyectos.seleccionar') }}" class="row g-3">
+    <form method="POST" action="{{ route('proyectos.seleccionar.post') }}" class="row g-3">
         @csrf
         <div class="col-md-6">
             <label for="proyecto_id" class="form-label">Proyecto</label>

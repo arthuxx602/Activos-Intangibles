@@ -4,67 +4,68 @@ namespace App\Http\Controllers\Proyecto;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\Proyecto;
+use Illuminate\Support\Facades\DB;
 
 class ProjectSelectionController extends Controller
 {
-    public function create(Request $request)
+    public function index(Request $request)
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $cedula = $request->session()->get('cedula');
+        $rol    = (int) $request->session()->get('rol');
 
-        // Relación belongsToMany en Usuario (ver modelos más abajo)
-        $proyectos = $user->proyectos()->orderBy('Nombre')->get(['ID_Proyecto','Nombre']);
+        $proyectos = DB::table('proyecto_usuario as pu')
+            ->join('proyecto as p', 'p.ID_Proyecto', '=', 'pu.FK_ID_Proyecto')
+            ->where('pu.FK_ID_Usuario', $cedula)
+            ->select('p.ID_Proyecto', 'p.Nombre')
+            ->orderBy('p.Nombre')
+            ->get();
 
         if ($proyectos->isEmpty()) {
-            // Si no tiene proyectos: Admin entra, otros se sacan como hacías en legacy
-            if ((int)$user->FK_ID_Rol === 1) {
-                return redirect()->to('/admin'); // ajusta a tu ruta real
-            }
-            return redirect()->route('landing')->with('error','No tiene proyectos asignados. Contacte al administrador.');
+            return $this->redirectPorRol($rol)->with('error', 'No tienes proyectos asignados.');
         }
 
         if ($proyectos->count() === 1) {
-            // Si solo hay uno, setear y redirigir de una
             $unico = $proyectos->first();
-            session([
-                'proyecto_seleccionado' => $unico->ID_Proyecto,
-                'nombre_proyecto'       => $unico->Nombre,
-            ]);
-            return $this->redirectPorRol((int)$user->FK_ID_Rol);
+            $this->guardarProyectoEnSesion($request, $unico->ID_Proyecto, $unico->Nombre);
+
+            return $this->redirectPorRol($rol);
         }
 
-        return view('landing.proyectos.elegir', compact('proyectos'));
+        return view('Landing.Proyectos.elegir', compact('proyectos'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'proyecto_id' => ['required','integer','exists:proyecto,ID_Proyecto'],
+        $data = $request->validate([
+            'proyecto_id' => ['required', 'integer', 'exists:proyecto,ID_Proyecto'],
         ]);
 
-        $proyecto = Proyecto::select('ID_Proyecto','Nombre')
-            ->where('ID_Proyecto', $request->proyecto_id)
+        $proyecto = DB::table('proyecto')
+            ->select('ID_Proyecto', 'Nombre')
+            ->where('ID_Proyecto', $data['proyecto_id'])
             ->first();
 
-        session([
-            'proyecto_seleccionado' => $proyecto->ID_Proyecto,
-            'nombre_proyecto'       => $proyecto->Nombre,
-        ]);
+        if ($proyecto) {
+            $this->guardarProyectoEnSesion($request, $proyecto->ID_Proyecto, $proyecto->Nombre);
+        }
 
-        $rol = (int)optional(Auth::user())->FK_ID_Rol;
+        $rol = (int) $request->session()->get('rol');
 
-        return $this->redirectPorRol($rol)->with('status','Proyecto seleccionado.');
+        return $this->redirectPorRol($rol)->with('status', 'Proyecto seleccionado.');
+    }
+
+    private function guardarProyectoEnSesion(Request $request, int $id, string $nombre): void
+    {
+        $request->session()->put('proyecto_seleccionado', $id);
+        $request->session()->put('nombre_proyecto', $nombre);
     }
 
     private function redirectPorRol(int $rol)
     {
         switch ($rol) {
-            case 1: return redirect()->to('/admin/inicio');        // ajusta si tienes route('admin.inicio')
-            case 2: return redirect()->to('/moderador/inicio');    // o route('moderador.inicio')
-            case 3: return redirect()->to('/inversionista/inicio');// o route('inversionista.inicio')
+            case 1: return redirect()->route('admin.inicio');
+            case 2: return redirect()->route('moderador.inicio');
+            case 3: return redirect()->route('inversionista.inicio');
             default: return redirect()->route('landing');
         }
     }
