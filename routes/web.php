@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\LogoutController;
 
 use App\Http\Controllers\Proyecto\ProjectSelectionController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\TipoInversionController;
 use App\Http\Controllers\Moderador\HomeController as ModHome;
 use App\Http\Controllers\Moderador\UsuarioController as ModUsuarios;
@@ -40,15 +41,13 @@ Route::middleware('web')->group(function () {
     Route::middleware('legacy.auth')->group(function () {
 
         // Rutas de aterrizaje por rol
-        Route::get('/admin', fn () => 'Admin')->name('admin.inicio');
-        Route::get('/moderador', fn () => 'Moderador')->name('moderador.inicio');
-        Route::get('/inversionista', fn () => 'Inversionista')->name('inversionista.inicio');
+        Route::get('/admin', [AdminDashboard::class, 'index'])->name('admin.inicio');
 
         // Selección de proyecto
         Route::get('/proyectos/seleccionar',  [ProjectSelectionController::class, 'index'])
             ->name('proyectos.seleccionar');
         Route::post('/proyectos/seleccionar', [ProjectSelectionController::class, 'store'])
-            ->name('proyectos.seleccionar.store');
+            ->name('proyectos.seleccionar.post');
 
         // Tipos de inversión protegidos
         Route::resource('/tipos', TipoInversionController::class);
