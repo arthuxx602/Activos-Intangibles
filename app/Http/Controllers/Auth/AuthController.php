@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 
 class AuthController extends Controller
 {
@@ -15,13 +17,23 @@ class AuthController extends Controller
         $cedula     = $request->input('cedula');
         $contrasena = $request->input('contrasena');
 
-        // ⚠️ En tu sistema legacy la contraseña NO está hasheada
+        // Soportar esquemas desactualizados sin FK_ID_Rol para evitar errores de consulta
+        $select = ['ID_Usuario', 'Nombre', 'Apellido', 'Contraseña'];
+
+        if (Schema::hasColumn('usuario2', 'FK_ID_Rol')) {
+            $select[] = DB::raw('FK_ID_Rol as rol');
+        } elseif (Schema::hasColumn('usuario2', 'Rol')) {
+            $select[] = DB::raw('Rol as rol');
+        } else {
+            $select[] = DB::raw('3 as rol'); // Valor por defecto cuando la columna aún no existe
+        }
+
         $user = DB::table('usuario2')
-            ->select('ID_Usuario', 'FK_ID_Rol as rol', 'Nombre', 'Apellido', 'Contraseña')
+            ->select($select)
             ->where('ID_Usuario', $cedula)
             ->first();
 
-        if (!$user || $user->Contraseña !== $contrasena) {
+        if (!$user || !Hash::check($contrasena, $user->Contraseña)) {
             return back()
                 ->withErrors(['cedula' => 'Credenciales incorrectas.'])
                 ->withInput()

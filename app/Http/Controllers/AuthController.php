@@ -9,6 +9,7 @@ use App\Models\ProyectoUsuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -22,13 +23,9 @@ class AuthController extends Controller
             'contrasena.required' => 'La contraseña es obligatoria',
         ]);
 
-        // NOTA: la BD actual guarda la contraseña en texto plano en el campo "Contraseña".
-        // Lo ideal sería migrar a hash (bcrypt) más adelante.
-        $usuario = Usuario::where('ID_Usuario', $data['cedula'])
-            ->where('Contraseña', $data['contrasena'])
-            ->first();
+        $usuario = Usuario::where('ID_Usuario', $data['cedula'])->first();
 
-        if (!$usuario) {
+        if (!$usuario || !Hash::check($data['contrasena'], $usuario->Contraseña)) {
             return back()->withErrors(['login' => 'Credenciales incorrectas'])->withInput();
         }
 
@@ -69,7 +66,7 @@ class AuthController extends Controller
         }
 
         // Tiene múltiples proyectos → enviar a elección
-        return redirect()->route('proyecto.elegir');
+        return redirect()->route('proyectos.seleccionar');
     }
 
     public function logout(Request $request)
