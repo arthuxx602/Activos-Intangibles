@@ -3,75 +3,92 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\DB;
+use App\Models\Usuario;
+use App\Models\Proyecto;
+use App\Models\ProyectoUsuario;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function login(LoginRequest $request): RedirectResponse
+    public function login(Request $request)
     {
-        $cedula     = $request->input('cedula');
-        $contrasena = $request->input('contrasena');
+        $data = $request->validate([
+            'cedula'     => ['required'],
+            'contrasena' => ['required'],
+        ], [
+            'cedula.required'     => 'La cédula es obligatoria',
+            'contrasena.required' => 'La contraseña es obligatoria',
+        ]);
 
-        // ⚠️ En tu sistema legacy la contraseña NO está hasheada
-        $user = DB::table('usuario2')
-            ->select('ID_Usuario', 'FK_ID_Rol as rol', 'Nombre', 'Apellido', 'Contraseña')
-            ->where('ID_Usuario', $cedula)
+        // NOTA: la BD actual guarda la contraseña en texto plano en el campo "Contraseña".
+        // Lo ideal sería migrar a hash (bcrypt) más adelante.
+        $usuario = Usuario::where('ID_Usuario', $data['cedula'])
+            ->where('Contraseña', $data['contrasena'])
             ->first();
 
-        if (!$user || $user->Contraseña !== $contrasena) {
-            return back()
-                ->withErrors(['cedula' => 'Credenciales incorrectas.'])
-                ->withInput()
-                ->with('open_login_modal', true);
+        if (!$usuario) {
+            return back()->withErrors(['login' => 'Credenciales incorrectas'])->withInput();
         }
 
-        // Sesión (igual que en el PHP legacy)
+        // Guardar datos básicos en sesión (modelo legacy)
         Session::put('authenticated', true);
-        Session::put('cedula', (int) $user->ID_Usuario);
-        Session::put('rol',    (int) $user->rol);
-        Session::put('nombre', $user->Nombre);
-        Session::put('apellido', $user->Apellido);
+        Session::put('cedula',   $usuario->ID_Usuario);
+        Session::put('rol',      (int)$usuario->FK_ID_Rol);
+        Session::put('nombre',   $usuario->Nombre);
+        Session::put('apellido', $usuario->Apellido);
 
-        // Proyectos del usuario
-        $proyectos = DB::table('proyecto_usuario as pu')
-            ->join('proyecto as p', 'p.ID_Proyecto', '=', 'pu.FK_ID_Proyecto')
-            ->where('pu.FK_ID_Usuario', $user->ID_Usuario)
-            ->select('p.ID_Proyecto', 'p.Nombre')
-            ->get();
+        // Proyectos vinculados
+        $proyectosIds = ProyectoUsuario::where('FK_ID_Usuario', $usuario->ID_Usuario)
+            ->pluck('FK_ID_Proyecto')
+            ->toArray();
 
-        $count = $proyectos->count();
+        $rol = (int)$usuario->FK_ID_Rol;
 
-        // Sin proyectos
-        if ($count === 0) {
-            if ((int)$user->rol === 1) {
-                return redirect()->route('admin.inicio'); // Admin sin proyectos
+        if (count($proyectosIds) === 0) {
+            if ($rol === 1) {
+                // Admin sin proyectos → lo dejamos entrar igual
+                return redirect()->route('admin.inicio');
             }
-            // Otros roles: mensaje y cerramos sesión
-            Session::invalidate();
-            Session::regenerateToken();
-
-            return back()
-                ->withErrors(['cedula' => 'No tienes proyectos asignados. Comunícate con el administrador.'])
-                ->with('open_login_modal', true);
+            // Otros roles necesitan proyecto
+            Session::flash('error', 'El usuario no tiene proyectos asignados. Contacte al administrador.');
+            return $this->logout($request);
         }
 
-        // Un solo proyecto -> lo fijamos en sesión y vamos directo según el rol
-        if ($count === 1) {
-            $p = $proyectos->first();
-            Session::put('proyecto_seleccionado', $p->ID_Proyecto);
-            Session::put('nombre_proyecto', $p->Nombre);
-
-            switch ((int)$user->rol) {
-                case 2: return redirect()->route('moderador.inicio');
-                case 3: return redirect()->route('inversionista.inicio');
-                default: return redirect()->route('admin.inicio');
+        if (count($proyectosIds) === 1) {
+            // Autoseleccionar proyecto
+            $pid = $proyectosIds[0];
+            $proyecto = Proyecto::find($pid);
+            if ($proyecto) {
+                Session::put('proyecto_seleccionado', $pid);
+                Session::put('nombre_proyecto', $proyecto->Nombre);
             }
+
+            return $this->redirigirPorRol($rol);
         }
 
-        // Varios proyectos -> ir a la página de elección
-        return redirect()->route('proyectos.seleccionar');
+        // Tiene múltiples proyectos → enviar a elección
+        return redirect()->route('proyecto.elegir');
     }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('landing')->with('status','Sesión cerrada.');
+    }
+
+    private function redirigirPorRol(int $rol)
+    {
+        return match ($rol) {
+            1 => redirect()->route('admin.inicio'),
+            2 => redirect()->route('moderador.inicio'),
+            3 => redirect()->route('inversionista.inicio'),
+            default => redirect()->route('landing'),
+        };
+    }
+    
 }

@@ -1,3 +1,4 @@
+-- Active: 1764040690518@@127.0.0.1@3306@activos_intangibles_db
 {{-- resources/views/landing/Sipmainputvalue.blade.php --}}
 <!DOCTYPE html>
 <html lang="es">
@@ -76,7 +77,7 @@
           <form method="post" action="{{ route('login') }}" onsubmit="return validarFormulario();">
             @csrf
             <div class="input-group custom">
-              <input type="number" class="form-control form-control-lg" placeholder="Cédula" id="cedula" name="cedula" value="{{ old('cedula') }}">
+              <input type="email" class="form-control form-control-lg" placeholder="correo" id="correo" name="correo" value="{{ old('correo') }}">
               <div class="input-group-append custom">
                 <span class="input-group-text"><i class="icon-copy dw dw-user1"></i></span>
               </div>
@@ -525,9 +526,9 @@
     });
 
     function validarFormulario() {
-      var cedula = document.getElementById("cedula").value;
+      var correo = document.getElementById("correo").value;
       var contrasena = document.getElementById("contrasena").value;
-      if (cedula.trim() === "" || contrasena.trim() === "") {
+      if (correo.trim() === "" || contrasena.trim() === "") {
         alert("Por favor, complete todos los campos.");
         return false;
       }
