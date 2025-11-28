@@ -1,3 +1,4 @@
+-- Active: 1764040690518@@127.0.0.1@3306@activos_intangibles_db
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\LogoutController;
 
 use App\Http\Controllers\Proyecto\ProjectSelectionController;
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\TipoInversionController;
 use App\Http\Controllers\Moderador\HomeController as ModHome;
 use App\Http\Controllers\Moderador\UsuarioController as ModUsuarios;
@@ -24,6 +26,7 @@ Route::middleware('web')->group(function () {
     //       PÚBLICAS
     // =======================
     Route::get('/', [LandingController::class, 'index'])->name('landing');
+    Route::get('/team', [LandingController::class, 'team'])->name('landing.team');
 
     // login/logout SIN middleware de autenticación
     Route::post('/login', [AuthController::class, 'login'])->name('login');
@@ -39,8 +42,17 @@ Route::middleware('web')->group(function () {
     // =======================
     Route::middleware('legacy.auth')->group(function () {
 
+        // =======================
+        //      ADMIN (rol=1)
+        // =======================
+        Route::middleware('legacy.role:1')
+            ->prefix('admin')
+            ->name('admin.')
+            ->group(function () {
+                Route::get('/', [AdminController::class, 'index'])->name('inicio');
+            });
+
         // Rutas de aterrizaje por rol
-        Route::get('/admin', fn () => 'Admin')->name('admin.inicio');
         Route::get('/moderador', fn () => 'Moderador')->name('moderador.inicio');
         Route::get('/inversionista', fn () => 'Inversionista')->name('inversionista.inicio');
 

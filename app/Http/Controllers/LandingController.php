@@ -18,6 +18,11 @@ class LandingController extends Controller
         return view('landing.index');
     }
 
+    public function team()
+    {
+        return view('landing.team');
+    }
+
     /**
      * Procesar Login
      */

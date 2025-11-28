@@ -11,8 +11,8 @@
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700|Raleway:300,400,500,600,700|Poppins:300,400,500,600,700" rel="stylesheet">
 
   {{-- Assets del landing (DEBEN estar en /public/assets) --}}
-  <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
-  <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+  <link href="{{ asset('assets/css/img/favicon.png') }}" rel="icon">
+  <link href="{{ asset('assets/css/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
   <link href="{{ asset('assets/vendor/aos/aos.css') }}" rel="stylesheet">
   <link href="{{ asset('assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ asset('assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
@@ -33,8 +33,7 @@
   {{-- Estilo del HERO con fondo usando hero-img.png --}}
   <style>
     #hero{
-      background: url("{{ asset('assets/css/img/hero-img.png') }}") right center no-repeat;
-      background-size: cover;
+      background: linear-gradient(90deg, #f7f9fb 0%, #ffffff 100%);
       padding: 80px 0;
     }
     #hero .btn-get-started{
@@ -46,8 +45,28 @@
       font-weight:600;
       text-decoration:none;
     }
+    #hero .hero-illustration{
+      max-width: 340px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 16px;
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #hero .hero-illustration img{
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
     @media (max-width: 991.98px) {
-      #hero{ background-position: center; }
+      #hero{ text-align: center; }
+      #hero .hero-illustration{
+        margin: 32px auto 0;
+        max-width: 280px;
+      }
     }
   </style>
 </head>
@@ -124,12 +143,8 @@
       <nav id="navbar" class="navbar order-last order-lg-0">
         <ul>
           <li><a class="nav-link scrollto active" href="#hero">Inicio</a></li>
-          <li class="dropdown"><a href="#"><span>Acerca de</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a class="nav-link scrollto" href="#about">Acerca de</a></li>
-              <li><a class="nav-link scrollto" href="#team">Nuestro equipo</a></li>
-            </ul>
-          </li>
+          <li><a class="nav-link scrollto" href="#about">Acerca de</a></li>
+          <li><a class="nav-link" href="{{ route('landing.team') }}">Nuestro equipo</a></li>
           <li><a class="nav-link scrollto" href="#services">Servicios</a></li>
           <li><a class="nav-link scrollto" href="#contact">Contacto</a></li>
           <li>
@@ -160,7 +175,9 @@
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img d-flex justify-content-center" data-aos="zoom-in">
-          <img src="{{ asset('assets/img/hero-img.png') }}" class="img-fluid" alt="Ilustración analítica" style="max-height:520px">
+          <div class="hero-illustration">
+            <img src="{{ asset('assets/css/img/hero-img.png') }}" class="img-fluid" alt="Ilustración analítica">
+          </div>
         </div>
       </div>
     </div>
@@ -171,7 +188,7 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-6" data-aos="zoom-in">
-          <img src="{{ asset('assets/img/about.jpg') }}" class="img-fluid" alt="">
+          <img src="{{ asset('assets/css/img/about.jpg') }}" class="img-fluid" alt="">
         </div>
         <div class="col-lg-6 d-flex flex-column justify-contents-center" data-aos="fade-left">
           <div class="content pt-4 pt-lg-0">
@@ -227,16 +244,16 @@
         <div class="col-lg-6 order-1 order-lg-2" data-aos="zoom-in">
           <div class="tab-content">
             <div class="tab-pane active show" id="tab-1">
-              <figure><img src="{{ asset('assets/img/features-1.png') }}" alt="" class="img-fluid"></figure>
+              <figure><img src="{{ asset('assets/css/img/features-1.png') }}" alt="" class="img-fluid"></figure>
             </div>
             <div class="tab-pane" id="tab-2">
-              <figure><img src="{{ asset('assets/img/features-2.png') }}" alt="" class="img-fluid"></figure>
+              <figure><img src="{{ asset('assets/css/img/features-2.png') }}" alt="" class="img-fluid"></figure>
             </div>
             <div class="tab-pane" id="tab-3">
-              <figure><img src="{{ asset('assets/img/features-3.png') }}" alt="" class="img-fluid"></figure>
+              <figure><img src="{{ asset('assets/css/img/features-3.png') }}" alt="" class="img-fluid"></figure>
             </div>
             <div class="tab-pane" id="tab-4">
-              <figure><img src="{{ asset('assets/img/features-4.png') }}" alt="" class="img-fluid"></figure>
+              <figure><img src="{{ asset('assets/css/img/features-4.png') }}" alt="" class="img-fluid"></figure>
             </div>
           </div>
         </div>
@@ -294,52 +311,6 @@
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  {{-- ======= Team ======= --}}
-  <section id="team" class="team">
-    <div class="container">
-      <div class="section-title" data-aos="fade-up">
-        <h2>Nuestro equipo</h2>
-        <p>Profesionales en desarrollo de software y gestión de inversiones.</p>
-      </div>
-
-      @php
-        $team = [
-          ['img' => 'team/Cristhian Raul.jpg',                     'name' => 'Cristhian Raul Mora Angulo',           'role' => 'Desarrollador'],
-          ['img' => 'team/Diana Karina Lopez Carreño.jpg',         'name' => 'Diana Karina López Carreño',           'role' => 'Docente'],
-          ['img' => 'team/Diego Alejandro Penagos Rojas.jpg',      'name' => 'Diego Alejandro Penagos Rojas',        'role' => 'Desarrollador'],
-          ['img' => 'team/Jonatan Riveros.jpg',                    'name' => 'Jonatan Mateo Riveros Méndez',         'role' => 'Desarrollador'],
-          ['img' => 'team/Kevin Alexander Pena Conejo.jpg',        'name' => 'Kevin Alexander Peña Conejo',          'role' => 'CTO'],
-          ['img' => 'team/Paula Cantor Caballero.jpg',             'name' => 'Paula Andrea Cantor Caballero',        'role' => ''],
-          ['img' => 'team/team-1.jpg',                             'name' => 'Micher Alexander Gonzales Monroy',     'role' => 'Docente'],
-          ['img' => 'team/team-1.jpg',                             'name' => 'Campo Eli Castillo Eraso',             'role' => 'Docente'],
-        ];
-      @endphp
-
-      <div class="row">
-        @foreach ($team as $p)
-          <div class="col-lg-4 col-md-6">
-            <div class="member" data-aos="zoom-in">
-              <div class="pic">
-                <img src="{{ asset('assets/img/'.$p['img']) }}" class="img-fluid" alt="{{ $p['name'] }}">
-              </div>
-              <div class="member-info">
-                <h4>{{ $p['name'] }}</h4>
-                @if(!empty($p['role'])) <span>{{ $p['role'] }}</span> @endif
-                <div class="social">
-                  <a href="#"><i class="bi bi-twitter"></i></a>
-                  <a href="#"><i class="bi bi-facebook"></i></a>
-                  <a href="#"><i class="bi bi-instagram"></i></a>
-                  <a href="#"><i class="bi bi-linkedin"></i></a>
-                </div>
-              </div>
-            </div>
-          </div>
-        @endforeach
-      </div>
-
     </div>
   </section>
 
@@ -468,7 +439,7 @@
           </div>
 
           <div class="col-lg-4 col-md-6 footer-newsletter">
-            <img src="{{ asset('assets/img/LogoU.png') }}" style="width: 100px; height: auto;" alt="Logo U">
+            <img src="{{ asset('assets/css/img/LogoU.png') }}" style="width: 140px; max-width: 100%; height: auto; object-fit: contain;" alt="Logo U">
           </div>
         </div>
       </div>
