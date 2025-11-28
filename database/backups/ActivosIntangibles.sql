@@ -1,3 +1,4 @@
+-- Active: 1764040690518@@127.0.0.1@3306@activos_intangibles_db
 -- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: activos_intangibles_db
