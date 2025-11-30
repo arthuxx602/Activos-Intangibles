@@ -50,6 +50,15 @@ Route::middleware('web')->group(function () {
             ->name('admin.')
             ->group(function () {
                 Route::get('/', [AdminController::class, 'index'])->name('inicio');
+                Route::view('/empresas',        'Admin.empresas.index')->name('empresas');
+                Route::view('/ubicacion',       'Admin.ubicacion.index')->name('ubicacion');
+                Route::view('/usuarios',        'Admin.usuarios.index')->name('usuarios');
+                Route::view('/tipos-inversion', 'Admin.tipos-inversion.index')->name('tipos-inversion');
+                Route::view('/inversiones',     'Admin.registro.index')->name('inversiones');
+                Route::view('/tasas',           'Admin.tasas.index')->name('tasas');
+                Route::view('/simulacion',      'Admin.simulacion.index')->name('simulacion');
+                Route::view('/liquidacion',     'Admin.liquidacion.index')->name('liquidacion');
+                Route::view('/consultas',       'Admin.consultas.index')->name('consultas');
             });
 
         // Rutas de aterrizaje por rol
