@@ -5,6 +5,8 @@
   <title>@yield('title', 'Panel Moderador')</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   {{-- Un solo @vite con todos tus assets --}}
   @vite([
     'resources/css/app.css',
@@ -59,6 +61,8 @@
 @endphp
 
 <body>
+
+  <x-role-navbar />
 
   {{-- Header --}}
   <div class="header">
